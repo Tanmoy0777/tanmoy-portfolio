@@ -3,294 +3,259 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tanmoy Acharjee | Revenue & Marketing Analytics Portfolio</title>
+<title>Tanmoy Acharjee — Revenue & Marketing Analytics</title>
 <meta name="description" content="Revenue Operations & Marketing Analytics specialist — turning raw data into pipeline revenue.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-/* ═══════════════════ DESIGN TOKENS ═══════════════════ */
 :root{
-  --neon:#00F5D4;--hot:#F72585;--volt:#ADFF2F;--purple:#C77DFF;--blue:#4361EE;--orange:#FF6B35;
-  --dark:#030712;--dark2:#0B1120;--dark3:#111827;--card:#0F172A;--card2:#1E293B;
-  --text:#E2E8F0;--muted:#64748B;--white:#FFFFFF;
-  --glass:rgba(15,23,42,.55);--glass-border:rgba(255,255,255,.06);
-  --radius:16px;--radius-sm:10px;--radius-xs:6px;
-  --transition:all .4s cubic-bezier(.16,1,.3,1);
-  --shadow-glow:0 0 80px -20px;
+  --accent:#c8c8c8;--accent2:#888;
+  --bg:#000;--bg2:#050505;--bg3:#0a0a0a;
+  --card:#080808;--card-border:rgba(255,255,255,.04);
+  --text:#d4d4d4;--muted:#555;--white:#fff;
+  --neon:#00F5D4;--hot:#F72585;--volt:#ADFF2F;--purple:#C77DFF;--blue:#4361EE;
+  --radius:12px;--radius-sm:8px;
+  --ease:cubic-bezier(.16,1,.3,1);
 }
-
-/* ═══════════════════ RESET ═══════════════════ */
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:80px}
-body{font-family:'Inter','DM Sans',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-::selection{background:rgba(0,245,212,.25);color:#fff}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:linear-gradient(var(--neon),var(--purple));border-radius:10px}
-img{max-width:100%;display:block}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:rgba(255,255,255,.1);color:#fff}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:10px}
 a{color:inherit;text-decoration:none}
 
-/* ═══════════════════ PRELOADER ═══════════════════ */
-#preloader{position:fixed;inset:0;z-index:10000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;transition:opacity .8s ease,visibility .8s}
+/* ═══ PRELOADER ═══ */
+#preloader{position:fixed;inset:0;z-index:10000;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;transition:opacity 1s,visibility 1s}
 #preloader.done{opacity:0;visibility:hidden;pointer-events:none}
-.loader-ring{width:48px;height:48px;border-radius:50%;border:2px solid transparent;border-top-color:var(--neon);border-right-color:var(--hot);animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loader-text{font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.25em;color:var(--muted);text-transform:uppercase}
+.loader-bar{width:48px;height:1px;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+.loader-bar::after{content:'';position:absolute;left:0;top:0;height:100%;width:100%;background:#fff;animation:loadSlide 1s ease infinite}
+@keyframes loadSlide{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.loader-label{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase}
 
-/* ═══════════════════ CANVAS TRAIL ═══════════════════ */
-#canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.35}
+/* ═══ WEBGL SHADER BG ═══ */
+#shaderCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:.2;pointer-events:none}
 
-/* ═══════════════════ NAV ═══════════════════ */
-nav{position:fixed;top:0;left:0;right:0;z-index:999;display:flex;align-items:center;justify-content:space-between;padding:0 2.5rem;height:60px;background:rgba(3,7,18,.6);backdrop-filter:blur(30px) saturate(1.6);border-bottom:1px solid var(--glass-border);transition:var(--transition)}
-nav.scrolled{background:rgba(3,7,18,.92);box-shadow:0 8px 32px rgba(0,0,0,.4)}
-.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--white);letter-spacing:-.03em}
-.nav-logo span{background:linear-gradient(135deg,var(--neon),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.nav-links{display:flex;gap:.25rem}
-.nav-links a{color:var(--muted);font-size:.77rem;font-weight:500;padding:.45rem .85rem;border-radius:8px;transition:var(--transition);letter-spacing:.01em}
-.nav-links a:hover,.nav-links a.active{color:var(--white);background:rgba(255,255,255,.06)}
-.nav-right{display:flex;align-items:center;gap:1rem}
-.nav-cta{background:var(--white);color:var(--dark);padding:.48rem 1.3rem;border-radius:8px;font-weight:600;font-size:.8rem;cursor:pointer;transition:var(--transition);border:none;letter-spacing:.01em}
-.nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,255,255,.15)}
+/* ═══ CANVAS TRAIL ═══ */
+#trailCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:.5}
+
+/* ═══ NAV ═══ */
+nav{position:fixed;top:0;left:0;right:0;z-index:999;display:flex;align-items:center;justify-content:space-between;padding:0 2.5rem;height:56px;background:rgba(0,0,0,.5);backdrop-filter:blur(40px) saturate(1.4);border-bottom:1px solid rgba(255,255,255,.03);transition:all .4s var(--ease)}
+nav.scrolled{background:rgba(0,0,0,.85)}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;color:#fff;letter-spacing:-.04em}
+.nav-logo span{color:var(--muted)}
+.nav-links{display:flex;gap:.15rem}
+.nav-links a{color:var(--muted);font-size:.72rem;font-weight:500;padding:.4rem .75rem;border-radius:6px;transition:all .3s var(--ease);letter-spacing:.01em}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,.04)}
+.nav-right{display:flex;align-items:center;gap:.8rem}
+.nav-cta{background:#fff;color:#000;padding:.4rem 1.15rem;border-radius:6px;font-weight:600;font-size:.72rem;cursor:pointer;transition:all .3s var(--ease);border:none}
+.nav-cta:hover{opacity:.85;transform:translateY(-1px)}
 .mobile-toggle{display:none;background:none;border:none;cursor:pointer;padding:4px}
-.mobile-toggle span{display:block;width:20px;height:1.5px;background:var(--text);margin:5px 0;border-radius:2px;transition:var(--transition)}
+.mobile-toggle span{display:block;width:18px;height:1.5px;background:var(--muted);margin:4px 0;transition:all .3s var(--ease)}
 
-/* ═══════════════════ HERO ═══════════════════ */
-#hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:8rem 3rem 5rem}
-.bg-grain{position:absolute;inset:0;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none;z-index:1}
-.glow-orb{position:absolute;border-radius:50%;filter:blur(120px);pointer-events:none;opacity:.06;z-index:0}
-.orb1{width:700px;height:700px;background:var(--neon);top:-300px;right:-200px}
-.orb2{width:500px;height:500px;background:var(--hot);bottom:-250px;left:-150px}
-.orb3{width:350px;height:350px;background:var(--purple);top:40%;left:45%}
-.hero-content{max-width:1280px;margin:0 auto;width:100%;position:relative;z-index:2;display:grid;grid-template-columns:1.2fr .8fr;gap:5rem;align-items:center}
-.hero-badge{display:inline-flex;align-items:center;gap:.55rem;background:rgba(0,245,212,.04);border:1px solid rgba(0,245,212,.1);color:var(--neon);padding:.35rem 1rem;border-radius:100px;font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.08em;margin-bottom:2rem}
-.hero-badge .pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--neon);animation:blink 1.5s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-h1.hero-title{font-family:'Syne',sans-serif;font-size:clamp(3rem,5.5vw,5.2rem);font-weight:800;line-height:.9;letter-spacing:-.06em;margin-bottom:1.5rem}
-.hero-line1{color:var(--white);display:block}
-.hero-line2{color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.2);display:block}
-.hero-line3{display:block;background:linear-gradient(135deg,var(--neon),var(--purple),var(--hot));background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradFlow 5s ease infinite}
-@keyframes gradFlow{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
-.hero-sub{color:var(--muted);font-size:.95rem;line-height:1.85;max-width:480px;margin-bottom:2.5rem;font-weight:400}
-.hero-sub strong{color:var(--text);font-weight:600}
-.hero-actions{display:flex;gap:.75rem;flex-wrap:wrap}
-.btn-primary{display:inline-flex;align-items:center;gap:.5rem;background:var(--white);color:var(--dark);padding:.75rem 1.8rem;border:none;font-weight:700;font-size:.88rem;cursor:pointer;border-radius:var(--radius-sm);transition:var(--transition);letter-spacing:-.01em}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(255,255,255,.2)}
-.btn-secondary{display:inline-flex;align-items:center;gap:.5rem;background:transparent;border:1px solid rgba(255,255,255,.12);color:var(--text);padding:.75rem 1.8rem;font-weight:600;font-size:.88rem;cursor:pointer;border-radius:var(--radius-sm);transition:var(--transition)}
-.btn-secondary:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.04);transform:translateY(-2px)}
-.hero-metrics{display:flex;flex-direction:column;gap:1rem}
-.metric-card{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:var(--radius);padding:1.8rem 2rem;position:relative;overflow:hidden;transition:var(--transition)}
-.metric-card:hover{transform:translateX(-8px);border-color:rgba(255,255,255,.1)}
-.metric-card::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2px}
-.metric-card:nth-child(1)::after{background:var(--neon)}.metric-card:nth-child(2)::after{background:var(--hot)}.metric-card:nth-child(3)::after{background:var(--volt)}
-.metric-value{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;line-height:1}
-.metric-card:nth-child(1) .metric-value{color:var(--neon)}.metric-card:nth-child(2) .metric-value{color:var(--hot)}.metric-card:nth-child(3) .metric-value{color:var(--volt)}
-.metric-label{color:var(--muted);font-size:.65rem;margin-top:.35rem;font-family:'Space Mono',monospace;letter-spacing:.06em;text-transform:uppercase}
+/* ═══ HERO ═══ */
+#hero{min-height:100vh;display:flex;align-items:center;position:relative;padding:8rem 3rem 5rem;z-index:2}
+.hero-inner{max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1.3fr .7fr;gap:5rem;align-items:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;color:var(--muted);font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2rem}
+.hero-dot{width:4px;height:4px;border-radius:50%;background:var(--muted);animation:dotPulse 2s infinite}
+@keyframes dotPulse{0%,100%{opacity:1}50%{opacity:.2}}
+h1.hero-h1{font-family:'Syne',sans-serif;font-size:clamp(3rem,5.5vw,5rem);font-weight:800;line-height:.88;letter-spacing:-.06em;margin-bottom:1.5rem;color:#fff}
+.h1-stroke{display:block;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.12)}
+.h1-typed{display:block;color:var(--muted);font-size:clamp(1.2rem,2.2vw,2rem);font-weight:400;letter-spacing:-.03em;margin-top:.3rem}
+.h1-typed span{color:rgba(255,255,255,.65)}
+.hero-p{color:var(--muted);font-size:.88rem;line-height:1.85;max-width:440px;margin-bottom:2.5rem;font-weight:400}
+.hero-p strong{color:var(--text);font-weight:500}
+.hero-btns{display:flex;gap:.6rem}
+.btn-w{display:inline-flex;align-items:center;gap:.4rem;background:#fff;color:#000;padding:.65rem 1.6rem;border:none;font-weight:600;font-size:.82rem;cursor:pointer;border-radius:var(--radius-sm);transition:all .3s var(--ease)}
+.btn-w:hover{opacity:.85;transform:translateY(-1px)}
+.btn-o{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid rgba(255,255,255,.08);color:var(--muted);padding:.65rem 1.6rem;font-weight:500;font-size:.82rem;cursor:pointer;border-radius:var(--radius-sm);transition:all .3s var(--ease)}
+.btn-o:hover{border-color:rgba(255,255,255,.15);color:#fff;transform:translateY(-1px)}
+.hero-stats{display:flex;flex-direction:column;gap:.75rem}
+.hstat{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.03);border-radius:var(--radius);padding:1.5rem 1.8rem;transition:all .4s var(--ease);position:relative;overflow:hidden}
+.hstat:hover{border-color:rgba(255,255,255,.06);transform:translateX(-4px)}
+.hstat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1.5px}
+.hstat:nth-child(1)::before{background:rgba(255,255,255,.15)}.hstat:nth-child(2)::before{background:rgba(255,255,255,.1)}.hstat:nth-child(3)::before{background:rgba(255,255,255,.07)}
+.hstat-num{font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;line-height:1;color:#fff}
+.hstat-label{color:var(--muted);font-size:.58rem;margin-top:.3rem;font-family:'Space Mono',monospace;letter-spacing:.06em;text-transform:uppercase}
 
-/* ═══════════════════ MARQUEE ═══════════════════ */
-.marquee-wrap{overflow:hidden;background:rgba(255,255,255,.015);border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);padding:.7rem 0}
-.marquee{display:flex;gap:3.5rem;animation:marquee 35s linear infinite;white-space:nowrap}
-@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.marquee-item{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--neon);letter-spacing:.15em;opacity:.4}
+/* ═══ DIVIDER ═══ */
+.divider{height:1px;background:rgba(255,255,255,.03)}
 
-/* ═══════════════════ SECTIONS ═══════════════════ */
-section{padding:7rem 3rem;position:relative;z-index:2}
-.section-inner{max-width:1280px;margin:0 auto}
-.section-eyebrow{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--neon);letter-spacing:.22em;text-transform:uppercase;margin-bottom:.5rem}
-.section-heading{font-family:'Syne',sans-serif;font-size:clamp(2rem,3.5vw,2.8rem);font-weight:800;letter-spacing:-.04em;line-height:1.05;margin-bottom:.75rem}
-.section-heading em{font-style:normal;color:transparent;-webkit-text-stroke:1px var(--muted)}
-.section-desc{color:var(--muted);font-size:.92rem;line-height:1.75;max-width:560px;margin-bottom:3.5rem}
+/* ═══ SECTIONS ═══ */
+section{padding:6rem 3rem;position:relative;z-index:2}
+.sec-inner{max-width:1200px;margin:0 auto}
+.sec-eyebrow{font-family:'Space Mono',monospace;font-size:.55rem;color:var(--muted);letter-spacing:.22em;text-transform:uppercase;margin-bottom:.4rem}
+.sec-heading{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,3vw,2.4rem);font-weight:800;letter-spacing:-.04em;line-height:1.05;margin-bottom:.6rem;color:#fff}
+.sec-heading em{font-style:normal;color:var(--muted);font-weight:400}
+.sec-desc{color:var(--muted);font-size:.85rem;line-height:1.75;max-width:500px;margin-bottom:3rem}
 
-/* ═══════════════════ SKILLS ═══════════════════ */
-#skills{background:var(--dark2)}
-.skills-groups{display:flex;flex-direction:column;gap:2.5rem}
-.skill-group-label{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.65rem;padding-bottom:.45rem;border-bottom:1px solid rgba(255,255,255,.03)}
-.skills-row{display:flex;flex-wrap:wrap;gap:.5rem}
-.skill-pill{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:100px;padding:.55rem 1rem;display:inline-flex;align-items:center;gap:.5rem;transition:var(--transition);cursor:default;font-size:.8rem;font-weight:500}
-.skill-pill:hover{border-color:rgba(0,245,212,.2);background:rgba(0,245,212,.04);transform:translateY(-2px)}
-.skill-pill .indicator{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+/* ═══ SKILLS ═══ */
+#skills{background:var(--bg2)}
+.sk-groups{display:flex;flex-direction:column;gap:2rem}
+.sk-label{font-family:'Space Mono',monospace;font-size:.55rem;color:rgba(255,255,255,.2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.55rem}
+.sk-row{display:flex;flex-wrap:wrap;gap:.4rem}
+.sk-pill{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:100px;padding:.45rem .9rem;font-size:.75rem;font-weight:400;color:var(--muted);transition:all .3s var(--ease);cursor:default}
+.sk-pill:hover{border-color:rgba(255,255,255,.1);color:var(--text);background:rgba(255,255,255,.03)}
 
-/* ═══════════════════ ORBITAL TIMELINE ═══════════════════ */
-#experience{background:var(--dark)}
-.orbital-section{display:grid;grid-template-columns:.65fr .35fr;gap:3rem;align-items:start}
-.orbital-container{position:relative;width:100%;aspect-ratio:1;max-width:620px;margin:0 auto;cursor:grab}
-.orbital-container:active{cursor:grabbing}
-.orbital-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue),var(--neon));display:flex;align-items:center;justify-content:center;z-index:10}
-.orbital-center::before{content:'';position:absolute;width:72px;height:72px;border-radius:50%;border:1px solid rgba(255,255,255,.12);animation:ping 2s cubic-bezier(0,0,.2,1) infinite}
-.orbital-center::after{content:'';position:absolute;width:88px;height:88px;border-radius:50%;border:1px solid rgba(255,255,255,.06);animation:ping 2s cubic-bezier(0,0,.2,1) infinite;animation-delay:.5s}
-@keyframes ping{75%,100%{transform:scale(1.8);opacity:0}}
-.orbital-core{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(4px)}
-.orbit-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid rgba(255,255,255,.04);transform:translate(-50%,-50%)}
-.orbit-ring-1{width:55%;height:55%}.orbit-ring-2{width:80%;height:80%}.orbit-ring-3{width:100%;height:100%}
-.orbital-node{position:absolute;transition:transform .7s cubic-bezier(.16,1,.3,1),opacity .5s;cursor:pointer;z-index:5}
-.orbital-node.active{z-index:20}
-.node-glow{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.15) 0%,transparent 70%);pointer-events:none;transition:opacity .3s}
-.node-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;border:2px solid rgba(255,255,255,.25);background:rgba(15,23,42,.9);backdrop-filter:blur(8px);color:var(--white);transition:var(--transition);position:relative;z-index:1}
-.orbital-node:hover .node-icon{border-color:rgba(255,255,255,.5);transform:scale(1.1)}
-.orbital-node.active .node-icon{background:var(--white);color:var(--dark);border-color:var(--white);transform:scale(1.35);box-shadow:0 0 30px rgba(255,255,255,.3)}
-.node-label{position:absolute;top:52px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.6rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5);transition:var(--transition);font-family:'Space Mono',monospace}
-.orbital-node.active .node-label{color:var(--white);transform:translateX(-50%) scale(1.1)}
-.node-pulse{position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(255,255,255,.3);animation:nodePulse 1.5s ease infinite;opacity:0}
-.orbital-node.related .node-pulse{opacity:1}
-.orbital-node.related .node-icon{border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.15)}
-@keyframes nodePulse{0%{transform:scale(1);opacity:.6}100%{transform:scale(2);opacity:0}}
+/* ═══ ORBITAL TIMELINE ═══ */
+#experience{background:var(--bg)}
+.orbital-layout{display:grid;grid-template-columns:.6fr .4fr;gap:3rem;align-items:start}
+.orbital-box{position:relative;width:100%;aspect-ratio:1;max-width:560px;margin:0 auto;cursor:grab}
+.orbital-box:active{cursor:grabbing}
+.orbital-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#333,#111);display:flex;align-items:center;justify-content:center;z-index:10;border:1px solid rgba(255,255,255,.08)}
+.orbital-center::before{content:'';position:absolute;width:64px;height:64px;border-radius:50%;border:1px solid rgba(255,255,255,.04);animation:oPing 2.5s ease infinite}
+@keyframes oPing{75%,100%{transform:scale(2);opacity:0}}
+.o-core{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.5)}
+.o-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid rgba(255,255,255,.02);transform:translate(-50%,-50%)}
+.o-ring-1{width:50%;height:50%}.o-ring-2{width:75%;height:75%}.o-ring-3{width:100%;height:100%}
+.o-node{position:absolute;transition:transform .6s var(--ease),opacity .4s;cursor:pointer;z-index:5}
+.o-node.active{z-index:20}
+.o-node-glow{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.08) 0%,transparent 70%);pointer-events:none}
+.o-node-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.9);color:rgba(255,255,255,.6);transition:all .3s var(--ease);position:relative;z-index:1}
+.o-node:hover .o-node-icon{border-color:rgba(255,255,255,.2);color:#fff}
+.o-node.active .o-node-icon{background:#fff;color:#000;border-color:#fff;transform:scale(1.3);box-shadow:0 0 40px rgba(255,255,255,.15)}
+.o-node-label{position:absolute;top:46px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.52rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.2);transition:all .3s var(--ease);font-family:'Space Mono',monospace}
+.o-node.active .o-node-label{color:#fff}
+.o-node-pulse{position:absolute;inset:-3px;border-radius:50%;border:1px solid rgba(255,255,255,.15);animation:nPulse 1.5s ease infinite;opacity:0}
+.o-node.related .o-node-pulse{opacity:1}
+.o-node.related .o-node-icon{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.06)}
+@keyframes nPulse{0%{transform:scale(1);opacity:.5}100%{transform:scale(2.2);opacity:0}}
+.o-card{position:absolute;top:72px;left:50%;transform:translateX(-50%);width:260px;background:rgba(8,8,8,.95);backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;z-index:30}
+.o-node.active .o-card{opacity:1;visibility:visible}
+.oc-head{padding:.8rem 1rem .4rem;display:flex;justify-content:space-between;align-items:center}
+.oc-badge{font-family:'Space Mono',monospace;font-size:.5rem;letter-spacing:.06em;padding:.15rem .5rem;border-radius:3px;border:1px solid rgba(255,255,255,.06);color:var(--muted)}
+.oc-badge.in-progress{color:#fff;border-color:rgba(255,255,255,.15)}
+.oc-date{font-family:'Space Mono',monospace;font-size:.5rem;color:rgba(255,255,255,.2)}
+.oc-title{padding:0 1rem;font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:#fff;margin-bottom:.3rem}
+.oc-body{padding:.2rem 1rem .7rem;font-size:.68rem;color:var(--muted);line-height:1.6}
+.oc-bar-wrap{padding:.5rem 1rem;border-top:1px solid rgba(255,255,255,.03)}
+.oc-bar-head{display:flex;justify-content:space-between;font-size:.5rem;color:rgba(255,255,255,.2);margin-bottom:.25rem;font-family:'Space Mono',monospace}
+.oc-bar{width:100%;height:2px;background:rgba(255,255,255,.03);border-radius:2px;overflow:hidden}
+.oc-bar-fill{height:100%;background:rgba(255,255,255,.25);border-radius:2px}
+.oc-conns{padding:.5rem 1rem .6rem;border-top:1px solid rgba(255,255,255,.03)}
+.oc-conns-label{font-size:.48rem;color:rgba(255,255,255,.15);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem;font-family:'Space Mono',monospace}
+.oc-conn-btn{background:transparent;border:1px solid rgba(255,255,255,.05);color:var(--muted);padding:.15rem .45rem;font-size:.55rem;cursor:pointer;transition:all .2s;font-family:inherit;border-radius:3px;margin:.1rem}
+.oc-conn-btn:hover{background:rgba(255,255,255,.05);color:#fff}
 
-/* Orbital Card */
-.orbital-card{position:absolute;top:85px;left:50%;transform:translateX(-50%);width:280px;background:rgba(15,23,42,.92);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:0;overflow:hidden;box-shadow:0 32px 64px rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s;z-index:30}
-.orbital-node.active .orbital-card{opacity:1;visibility:visible}
-.orbital-card::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:30px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent)}
-.ocard-header{padding:1rem 1.2rem .6rem;display:flex;justify-content:space-between;align-items:center}
-.ocard-badge{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.06em;padding:.2rem .6rem;border-radius:4px;font-weight:700}
-.ocard-badge.completed{background:rgba(0,245,212,.1);color:var(--neon);border:1px solid rgba(0,245,212,.2)}
-.ocard-badge.in-progress{background:rgba(255,255,255,.1);color:var(--white);border:1px solid rgba(255,255,255,.2)}
-.ocard-badge.pending{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid rgba(255,255,255,.06)}
-.ocard-date{font-family:'Space Mono',monospace;font-size:.55rem;color:var(--muted)}
-.ocard-title{padding:0 1.2rem;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--white);margin-bottom:.4rem}
-.ocard-body{padding:.4rem 1.2rem 1rem;font-size:.75rem;color:rgba(255,255,255,.6);line-height:1.65}
-.ocard-energy{padding:.6rem 1.2rem;border-top:1px solid rgba(255,255,255,.05)}
-.ocard-energy-header{display:flex;justify-content:space-between;align-items:center;font-size:.6rem;color:var(--muted);margin-bottom:.35rem}
-.ocard-energy-header span{font-family:'Space Mono',monospace}
-.energy-bar{width:100%;height:3px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
-.energy-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:4px;transition:width .6s ease}
-.ocard-connections{padding:.6rem 1.2rem .8rem;border-top:1px solid rgba(255,255,255,.05)}
-.ocard-conn-label{font-size:.55rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem;font-family:'Space Mono',monospace}
-.ocard-conn-list{display:flex;flex-wrap:wrap;gap:.3rem}
-.ocard-conn-btn{background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65);padding:.2rem .55rem;font-size:.6rem;cursor:pointer;transition:var(--transition);font-family:inherit;border-radius:4px}
-.ocard-conn-btn:hover{background:rgba(255,255,255,.08);color:var(--white)}
+/* Detail Panel */
+.o-detail{position:sticky;top:90px}
+.o-panel{background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.03);border-radius:var(--radius);padding:2rem;min-height:280px}
+.o-placeholder{text-align:center;padding:3.5rem 1rem}
+.o-placeholder-icon{font-size:2rem;opacity:.1;margin-bottom:.8rem}
+.o-placeholder-text{color:rgba(255,255,255,.15);font-size:.78rem}
+.o-tag{display:inline-block;font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:.06em;padding:.2rem .6rem;border-radius:4px;margin-bottom:1rem;border:1px solid rgba(255,255,255,.06);color:var(--muted)}
+.o-company{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:.1rem}
+.o-period{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);margin-bottom:1.2rem}
+.o-bullets{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.o-bullets li{color:var(--muted);font-size:.8rem;line-height:1.7;padding-left:1.1rem;position:relative}
+.o-bullets li::before{content:'';position:absolute;left:0;top:.55rem;width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.15)}
+.o-metric{display:inline-flex;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.5);font-size:.58rem;font-family:'Space Mono',monospace;padding:.1rem .45rem;border-radius:3px;margin-left:.3rem}
 
-/* Orbital Detail Panel */
-.orbital-detail{position:sticky;top:100px}
-.detail-panel{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:var(--radius);padding:2rem;min-height:300px}
-.detail-placeholder{text-align:center;padding:4rem 0}
-.detail-placeholder-icon{font-size:2.5rem;margin-bottom:1rem;opacity:.3}
-.detail-placeholder-text{color:var(--muted);font-size:.85rem}
-.detail-active .detail-panel{border-color:rgba(255,255,255,.1)}
-.detail-role-tag{display:inline-block;font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.06em;padding:.25rem .7rem;border-radius:var(--radius-xs);margin-bottom:1.2rem}
-.detail-role-tag.neon{background:rgba(0,245,212,.06);color:var(--neon);border:1px solid rgba(0,245,212,.15)}
-.detail-role-tag.hot{background:rgba(247,37,133,.06);color:var(--hot);border:1px solid rgba(247,37,133,.15)}
-.detail-role-tag.volt{background:rgba(173,255,47,.06);color:var(--volt);border:1px solid rgba(173,255,47,.15)}
-.detail-company{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--white);margin-bottom:.15rem}
-.detail-period{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--neon);margin-bottom:1.2rem}
-.detail-bullets{list-style:none;display:flex;flex-direction:column;gap:.6rem}
-.detail-bullets li{color:var(--muted);font-size:.84rem;line-height:1.7;padding-left:1.3rem;position:relative}
-.detail-bullets li::before{content:'';position:absolute;left:0;top:.6rem;width:4px;height:4px;border-radius:50%;background:var(--neon)}
-.detail-metric{display:inline-flex;background:rgba(173,255,47,.05);border:1px solid rgba(173,255,47,.12);color:var(--volt);font-size:.62rem;font-family:'Space Mono',monospace;padding:.12rem .5rem;border-radius:4px;margin-left:.3rem;font-weight:700}
-
-/* ═══════════════════ PROJECTS ═══════════════════ */
-#projects{background:var(--dark3)}
-.projects-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
-.proj-card{background:var(--card);border:1px solid var(--glass-border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:var(--transition);display:flex;flex-direction:column;position:relative}
-.proj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;transition:var(--transition)}
-.proj-card[data-accent="neon"]::before{background:var(--neon)}.proj-card[data-accent="hot"]::before{background:var(--hot)}.proj-card[data-accent="volt"]::before{background:var(--volt)}.proj-card[data-accent="purple"]::before{background:var(--purple)}
-.proj-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.08)}
-.proj-card[data-accent="neon"]:hover{box-shadow:var(--shadow-glow) rgba(0,245,212,.1)}
-.proj-card[data-accent="hot"]:hover{box-shadow:var(--shadow-glow) rgba(247,37,133,.1)}
-.proj-card[data-accent="volt"]:hover{box-shadow:var(--shadow-glow) rgba(173,255,47,.1)}
-.proj-card[data-accent="purple"]:hover{box-shadow:var(--shadow-glow) rgba(199,125,255,.1)}
-.proj-inner{padding:1.8rem;flex:1;display:flex;flex-direction:column}
-.proj-num{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.12em;margin-bottom:.75rem}
-.proj-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
-.proj-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
-.proj-badge{font-family:'Space Mono',monospace;font-size:.55rem;padding:.22rem .65rem;border-radius:4px;letter-spacing:.04em}
-.proj-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:.55rem;line-height:1.2;color:var(--white)}
-.proj-summary{font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:1.2rem;flex:1}
-.proj-chart-wrap{background:rgba(3,7,18,.5);border-radius:var(--radius-sm);padding:.8rem;margin-bottom:1.2rem;height:105px}
-.proj-chart-wrap canvas{max-height:90px}
-.proj-insight{background:rgba(0,245,212,.02);border:1px solid rgba(0,245,212,.06);border-radius:var(--radius-sm);padding:.75rem;margin-bottom:1.2rem;font-size:.77rem;color:var(--muted);line-height:1.6}
+/* ═══ PROJECTS ═══ */
+#projects{background:var(--bg2)}
+.proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.proj-card{background:var(--card);border:1px solid rgba(255,255,255,.03);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .4s var(--ease);display:flex;flex-direction:column}
+.proj-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.06);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.proj-inner{padding:1.6rem;flex:1;display:flex;flex-direction:column}
+.proj-num{font-family:'Space Mono',monospace;font-size:.5rem;letter-spacing:.15em;color:rgba(255,255,255,.15);margin-bottom:.7rem}
+.proj-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.proj-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)}
+.proj-badge{font-family:'Space Mono',monospace;font-size:.5rem;padding:.18rem .55rem;border-radius:3px;border:1px solid rgba(255,255,255,.06);color:var(--muted)}
+.proj-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;margin-bottom:.45rem;line-height:1.2;color:#fff}
+.proj-summary{font-size:.78rem;color:var(--muted);line-height:1.7;margin-bottom:1.1rem;flex:1}
+.proj-chart{background:rgba(255,255,255,.01);border-radius:var(--radius-sm);padding:.7rem;margin-bottom:1rem;height:95px;border:1px solid rgba(255,255,255,.02)}
+.proj-chart canvas{max-height:80px}
+.proj-insight{background:rgba(255,255,255,.01);border:1px solid rgba(255,255,255,.03);border-radius:var(--radius-sm);padding:.7rem;margin-bottom:1rem;font-size:.72rem;color:var(--muted);line-height:1.6}
 .proj-insight strong{color:var(--text)}
-.proj-insight-tag{font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:.06em;margin-bottom:.2rem;display:block}
-.proj-kpis{display:flex;gap:1.2rem;margin-bottom:1.2rem;flex-wrap:wrap}
-.proj-kpi .num{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800}
-.proj-kpi .lbl{font-size:.6rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:.05rem}
-.proj-tech{display:flex;gap:.35rem;flex-wrap:wrap}
-.proj-tech-tag{font-family:'Space Mono',monospace;font-size:.55rem;padding:.18rem .5rem;border-radius:4px;letter-spacing:.03em}
-.proj-footer{padding:.9rem 1.8rem;border-top:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.01)}
-.proj-cta{display:inline-flex;align-items:center;gap:.45rem;font-weight:700;font-size:.8rem;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;border:none;transition:var(--transition)}
-.proj-cta .arrow{transition:transform .25s}.proj-cta:hover .arrow{transform:translateX(4px)}
-.proj-cta.neon{background:rgba(0,245,212,.06);color:var(--neon);border:1px solid rgba(0,245,212,.15)}.proj-cta.neon:hover{background:var(--neon);color:var(--dark)}
-.proj-cta.hot{background:rgba(247,37,133,.06);color:var(--hot);border:1px solid rgba(247,37,133,.15)}.proj-cta.hot:hover{background:var(--hot);color:#fff}
-.proj-cta.volt{background:rgba(173,255,47,.06);color:var(--volt);border:1px solid rgba(173,255,47,.15)}.proj-cta.volt:hover{background:var(--volt);color:var(--dark)}
-.proj-cta.purple{background:rgba(199,125,255,.06);color:var(--purple);border:1px solid rgba(199,125,255,.15)}.proj-cta.purple:hover{background:var(--purple);color:#fff}
-.proj-complexity{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted)}
+.proj-insight-tag{font-family:'Space Mono',monospace;font-size:.48rem;letter-spacing:.08em;color:rgba(255,255,255,.25);margin-bottom:.15rem;display:block}
+.proj-kpis{display:flex;gap:1.1rem;margin-bottom:1rem}
+.proj-kpi .num{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:#fff}
+.proj-kpi .lbl{font-size:.52rem;color:rgba(255,255,255,.2);font-family:'Space Mono',monospace;margin-top:.02rem}
+.proj-tech{display:flex;gap:.3rem;flex-wrap:wrap}
+.proj-tech-tag{font-family:'Space Mono',monospace;font-size:.5rem;padding:.15rem .45rem;border-radius:3px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);color:var(--muted)}
+.proj-foot{padding:.75rem 1.6rem;border-top:1px solid rgba(255,255,255,.03);display:flex;align-items:center;justify-content:space-between}
+.proj-cta{display:inline-flex;align-items:center;gap:.4rem;font-weight:600;font-size:.75rem;padding:.4rem 1rem;border-radius:6px;cursor:pointer;border:1px solid rgba(255,255,255,.06);background:transparent;color:var(--muted);transition:all .3s var(--ease)}
+.proj-cta:hover{background:#fff;color:#000;border-color:#fff}
+.proj-cta .arrow{transition:transform .2s}.proj-cta:hover .arrow{transform:translateX(3px)}
+.proj-complexity{font-family:'Space Mono',monospace;font-size:.5rem;color:rgba(255,255,255,.15)}
 
-/* ═══════════════════ PROJECT VIEWER ═══════════════════ */
-.project-viewer{position:fixed;inset:0;z-index:9999;background:rgba(3,7,18,.94);backdrop-filter:blur(20px);opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s;display:flex;flex-direction:column}
-.project-viewer.open{opacity:1;visibility:visible}
-.viewer-bar{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1.5rem;background:rgba(11,17,32,.95);border-bottom:1px solid var(--glass-border);flex-shrink:0;min-height:52px}
+/* ═══ VIEWER ═══ */
+.viewer{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.95);backdrop-filter:blur(30px);opacity:0;visibility:hidden;transition:opacity .35s,visibility .35s;display:flex;flex-direction:column}
+.viewer.open{opacity:1;visibility:visible}
+.viewer-bar{display:flex;align-items:center;justify-content:space-between;padding:.5rem 1.2rem;background:rgba(0,0,0,.9);border-bottom:1px solid rgba(255,255,255,.03);flex-shrink:0;min-height:48px}
 .viewer-info{display:flex;flex-direction:column}
-.viewer-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--white)}
-.viewer-sub{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:.05em}
-.viewer-tabs{display:flex;gap:.35rem}
-.viewer-tab{background:rgba(255,255,255,.04);border:1px solid var(--glass-border);color:var(--muted);padding:.35rem .85rem;border-radius:6px;font-size:.72rem;font-weight:500;cursor:pointer;transition:var(--transition)}
-.viewer-tab:hover{background:rgba(255,255,255,.08);color:var(--text)}
-.viewer-tab.active{background:rgba(0,245,212,.08);border-color:rgba(0,245,212,.2);color:var(--neon)}
-.viewer-close{background:rgba(247,37,133,.06);border:1px solid rgba(247,37,133,.15);color:var(--hot);width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);font-size:1rem}
-.viewer-close:hover{background:var(--hot);color:#fff}
-.viewer-frame-wrap{flex:1;overflow:hidden}
-.viewer-frame-wrap iframe{width:100%;height:100%;border:none;background:var(--dark)}
+.viewer-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:#fff}
+.viewer-sub{font-family:'Space Mono',monospace;font-size:.52rem;color:var(--muted);letter-spacing:.05em}
+.viewer-tabs{display:flex;gap:.25rem}
+.viewer-tab{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);color:var(--muted);padding:.3rem .7rem;border-radius:5px;font-size:.65rem;font-weight:500;cursor:pointer;transition:all .25s var(--ease)}
+.viewer-tab:hover{color:#fff}
+.viewer-tab.active{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12);color:#fff}
+.viewer-close{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--muted);width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;font-size:.9rem}
+.viewer-close:hover{background:#fff;color:#000}
+.viewer-frame{flex:1;overflow:hidden}
+.viewer-frame iframe{width:100%;height:100%;border:none;background:#000}
 
-/* ═══════════════════ CONTACT ═══════════════════ */
-#contact{background:var(--dark);border-top:1px solid var(--glass-border)}
-.contact-layout{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
-.contact-cta h2{font-family:'Syne',sans-serif;font-size:clamp(2rem,3.2vw,2.8rem);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-bottom:.9rem}
-.contact-cta p{color:var(--muted);font-size:.9rem;line-height:1.8;margin-bottom:2.2rem}
-.contact-cards{display:flex;flex-direction:column;gap:.65rem}
-.contact-card{display:flex;align-items:center;gap:1rem;padding:1rem 1.15rem;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:var(--radius-sm);transition:var(--transition)}
-.contact-card:hover{border-color:rgba(0,245,212,.15);transform:translateX(6px);background:rgba(0,245,212,.02)}
-.contact-card-icon{width:38px;height:38px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1rem;background:rgba(0,245,212,.04);flex-shrink:0}
-.contact-card-info{display:flex;flex-direction:column}
-.contact-card-label{font-size:.58rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.06em;text-transform:uppercase}
-.contact-card-val{font-size:.85rem;font-weight:500}
+/* ═══ CONTACT ═══ */
+#contact{background:var(--bg)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+.contact-heading h2{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,3vw,2.5rem);font-weight:800;letter-spacing:-.04em;line-height:1.05;margin-bottom:.8rem;color:#fff}
+.contact-heading p{color:var(--muted);font-size:.85rem;line-height:1.8;margin-bottom:2rem}
+.contact-cards{display:flex;flex-direction:column;gap:.5rem}
+.c-card{display:flex;align-items:center;gap:.9rem;padding:.85rem 1rem;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.03);border-radius:var(--radius-sm);transition:all .3s var(--ease)}
+.c-card:hover{border-color:rgba(255,255,255,.08);transform:translateX(4px)}
+.c-card-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);flex-shrink:0}
+.c-card-info{display:flex;flex-direction:column}
+.c-card-label{font-size:.5rem;color:rgba(255,255,255,.2);font-family:'Space Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
+.c-card-val{font-size:.8rem;font-weight:500;color:var(--text)}
 
-/* ═══════════════════ FOOTER ═══════════════════ */
-footer{padding:2rem 3rem;border-top:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2}
-footer p{color:var(--muted);font-size:.68rem;font-family:'Space Mono',monospace}
+/* ═══ FOOTER ═══ */
+footer{padding:1.8rem 3rem;border-top:1px solid rgba(255,255,255,.03);display:flex;align-items:center;justify-content:space-between;z-index:2;position:relative}
+footer p{color:rgba(255,255,255,.15);font-size:.6rem;font-family:'Space Mono',monospace}
 
-/* ═══════════════════ ANIMATIONS ═══════════════════ */
-.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+/* ═══ REVEAL ═══ */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
 .reveal.visible{opacity:1;transform:translateY(0)}
-.reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}.reveal-d3{transition-delay:.3s}
-.cursor-blink{display:inline-block;width:2px;height:.8em;background:var(--neon);margin-left:2px;animation:curBlink .65s infinite;vertical-align:middle}
-@keyframes curBlink{0%,100%{opacity:1}50%{opacity:0}}
+.reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}
 
-/* ═══════════════════ BACK TO TOP ═══════════════════ */
-.btt{position:fixed;bottom:1.5rem;right:1.5rem;z-index:998;width:40px;height:40px;border-radius:var(--radius-sm);background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--glass-border);color:var(--neon);font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);opacity:0;transform:translateY(10px);pointer-events:none}
-.btt.show{opacity:1;transform:translateY(0);pointer-events:all}
-.btt:hover{background:var(--neon);color:var(--dark);border-color:var(--neon)}
+/* ═══ BTT ═══ */
+.btt{position:fixed;bottom:1.2rem;right:1.2rem;z-index:998;width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);color:var(--muted);font-size:.9rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s var(--ease);opacity:0;pointer-events:none}
+.btt.show{opacity:1;pointer-events:all}
+.btt:hover{background:#fff;color:#000}
 
-/* ═══════════════════ RESPONSIVE ═══════════════════ */
+/* ═══ RESPONSIVE ═══ */
 @media(max-width:1100px){
-  .hero-content{grid-template-columns:1fr;gap:3rem}
-  .hero-metrics{flex-direction:row;flex-wrap:wrap}.metric-card{flex:1;min-width:180px}
-  .orbital-section{grid-template-columns:1fr;gap:2rem}
-  .orbital-container{max-width:500px}
-  .projects-grid{grid-template-columns:1fr}
-  .contact-layout{grid-template-columns:1fr}
+  .hero-inner{grid-template-columns:1fr;gap:2.5rem}
+  .hero-stats{flex-direction:row;flex-wrap:wrap}.hstat{flex:1;min-width:160px}
+  .orbital-layout{grid-template-columns:1fr;gap:2rem}
+  .orbital-box{max-width:420px}
+  .proj-grid{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
 }
 @media(max-width:768px){
-  nav{padding:0 1.2rem}
-  .nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:rgba(3,7,18,.98);flex-direction:column;padding:1rem;gap:0;border-bottom:1px solid var(--glass-border)}
+  nav{padding:0 1rem}
+  .nav-links{display:none;position:absolute;top:56px;left:0;right:0;background:rgba(0,0,0,.97);flex-direction:column;padding:.8rem;border-bottom:1px solid rgba(255,255,255,.03)}
   .nav-links.open{display:flex}
-  .nav-links a{padding:.7rem .5rem;border-bottom:1px solid rgba(255,255,255,.03)}
   .mobile-toggle{display:block}
-  section{padding:4.5rem 1.2rem}
-  .orbital-container{max-width:360px}
-  .orbital-card{width:240px}
-  .viewer-bar{flex-wrap:wrap;gap:.5rem;padding:.6rem .8rem}
+  section{padding:4rem 1.2rem}
+  .orbital-box{max-width:320px}
+  .o-card{width:220px}
+  .viewer-bar{flex-wrap:wrap;gap:.4rem;padding:.5rem}
   .viewer-tabs{flex-wrap:wrap}
-  footer{flex-direction:column;gap:.5rem;text-align:center}
+  footer{flex-direction:column;gap:.4rem;text-align:center}
 }
 </style>
 </head>
 <body>
 
-<!-- PRELOADER -->
-<div id="preloader">
-  <div class="loader-ring"></div>
-  <div class="loader-text">Loading Portfolio</div>
-</div>
+<div id="preloader"><div class="loader-bar"></div><div class="loader-label">Loading</div></div>
 
-<!-- CANVAS TRAIL EFFECT (21st.dev) -->
-<canvas id="canvas"></canvas>
+<!-- WebGL Shader Background (21st.dev) -->
+<canvas id="shaderCanvas"></canvas>
+
+<!-- Canvas Trail -->
+<canvas id="trailCanvas"></canvas>
 
 <!-- NAV -->
 <nav>
@@ -308,467 +273,308 @@ footer p{color:var(--muted);font-size:.68rem;font-family:'Space Mono',monospace}
   </div>
 </nav>
 
-<!-- ═══════════════════ HERO ═══════════════════ -->
+<!-- HERO -->
 <section id="hero">
-  <div class="bg-grain"></div>
-  <div class="glow-orb orb1"></div>
-  <div class="glow-orb orb2"></div>
-  <div class="glow-orb orb3"></div>
-  <div class="hero-content">
+  <div class="hero-inner">
     <div>
-      <div class="hero-badge"><span class="pulse-dot"></span> Open to Opportunities &middot; Relocatable</div>
-      <h1 class="hero-title">
-        <span class="hero-line1">TANMOY</span>
-        <span class="hero-line2">ACHARJEE</span>
-        <span class="hero-line3" id="typedRole"></span>
+      <div class="hero-eyebrow"><span class="hero-dot"></span> Available for Opportunities</div>
+      <h1 class="hero-h1">
+        <span>TANMOY</span>
+        <span class="h1-stroke">ACHARJEE</span>
+        <span class="h1-typed" id="typedRole"></span>
       </h1>
-      <p class="hero-sub"><strong>Revenue Operations &amp; Marketing Analytics</strong> specialist — turning raw data into pipeline revenue. 2.5+ years building full-funnel BI infrastructure, attribution models, and campaign automation for B2B SaaS companies.</p>
-      <div class="hero-actions">
-        <a href="#projects" class="btn-primary">View Projects &#8595;</a>
-        <a href="#contact" class="btn-secondary">Get in Touch</a>
+      <p class="hero-p"><strong>Revenue Operations &amp; Marketing Analytics</strong> — turning raw data into pipeline revenue. 2.5+ years building full-funnel BI infrastructure, attribution models, and campaign automation.</p>
+      <div class="hero-btns">
+        <a href="#projects" class="btn-w">View Projects &#8595;</a>
+        <a href="#contact" class="btn-o">Get in Touch</a>
       </div>
     </div>
-    <div class="hero-metrics">
-      <div class="metric-card reveal"><div class="metric-value" data-target="40">0</div><div class="metric-label">HRS / MONTH REPORTING AUTOMATED</div></div>
-      <div class="metric-card reveal reveal-d1"><div class="metric-value" data-target="18">0<span>%</span></div><div class="metric-label">QUALIFIED PIPELINE RECOVERED</div></div>
-      <div class="metric-card reveal reveal-d2"><div class="metric-value" data-target="30">0<span>%</span></div><div class="metric-label">PROCESS OPTIMISATION GAIN</div></div>
+    <div class="hero-stats">
+      <div class="hstat reveal"><div class="hstat-num" data-target="40">0</div><div class="hstat-label">Hrs / month automated</div></div>
+      <div class="hstat reveal reveal-d1"><div class="hstat-num" data-target="18">0<span>%</span></div><div class="hstat-label">Pipeline recovered</div></div>
+      <div class="hstat reveal reveal-d2"><div class="hstat-num" data-target="30">0<span>%</span></div><div class="hstat-label">Process optimisation</div></div>
     </div>
   </div>
 </section>
 
-<!-- MARQUEE -->
-<div class="marquee-wrap"><div class="marquee">
-  <span class="marquee-item">POWER BI</span><span class="marquee-item">ADOBE MARKETO</span><span class="marquee-item">MS DYNAMICS 365</span><span class="marquee-item">ETL PIPELINES</span><span class="marquee-item">MULTI-TOUCH ATTRIBUTION</span><span class="marquee-item">ABM STRATEGY</span><span class="marquee-item">SQL</span><span class="marquee-item">GOOGLE ANALYTICS 4</span><span class="marquee-item">REVENUE OPS</span><span class="marquee-item">FUNNEL OPTIMISATION</span><span class="marquee-item">COHORT ANALYSIS</span><span class="marquee-item">DIMENSIONAL MODELLING</span>
-  <span class="marquee-item">POWER BI</span><span class="marquee-item">ADOBE MARKETO</span><span class="marquee-item">MS DYNAMICS 365</span><span class="marquee-item">ETL PIPELINES</span><span class="marquee-item">MULTI-TOUCH ATTRIBUTION</span><span class="marquee-item">ABM STRATEGY</span><span class="marquee-item">SQL</span><span class="marquee-item">GOOGLE ANALYTICS 4</span><span class="marquee-item">REVENUE OPS</span><span class="marquee-item">FUNNEL OPTIMISATION</span><span class="marquee-item">COHORT ANALYSIS</span><span class="marquee-item">DIMENSIONAL MODELLING</span>
-</div></div>
+<div class="divider"></div>
 
-<!-- ═══════════════════ SKILLS ═══════════════════ -->
+<!-- SKILLS -->
 <section id="skills">
-  <div class="section-inner">
-    <div class="section-eyebrow">Core Toolkit</div>
-    <h2 class="section-heading">Skills &amp; <em>Technologies</em></h2>
-    <div class="section-desc">Comprehensive skill set spanning analytics, automation, and strategic marketing operations.</div>
-    <div class="skills-groups">
-      <div class="reveal">
-        <div class="skill-group-label">BI &amp; Analytics</div>
-        <div class="skills-row">
-          <div class="skill-pill"><div class="indicator" style="background:var(--neon)"></div>Power BI &middot; DAX</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--neon)"></div>Google Analytics 4</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--neon)"></div>Pipeline Forecasting</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--neon)"></div>Cohort Analysis</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--neon)"></div>A/B Testing</div>
-        </div>
-      </div>
-      <div class="reveal reveal-d1">
-        <div class="skill-group-label">Marketing Ops &amp; CRM</div>
-        <div class="skills-row">
-          <div class="skill-pill"><div class="indicator" style="background:var(--hot)"></div>Adobe Marketo</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--hot)"></div>MS Dynamics 365</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--hot)"></div>ActiveCampaign</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--hot)"></div>Multi-Touch Attribution</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--hot)"></div>ABM Strategy</div>
-        </div>
-      </div>
-      <div class="reveal reveal-d2">
-        <div class="skill-group-label">Data Engineering &amp; Strategy</div>
-        <div class="skills-row">
-          <div class="skill-pill"><div class="indicator" style="background:var(--volt)"></div>SQL</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--volt)"></div>ETL Pipeline Design</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--volt)"></div>Dimensional Modelling</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--volt)"></div>Advanced Excel / VBA</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--volt)"></div>OKR / KPI Frameworks</div>
-        </div>
-      </div>
-      <div class="reveal reveal-d3">
-        <div class="skill-group-label">Channels &amp; Growth</div>
-        <div class="skills-row">
-          <div class="skill-pill"><div class="indicator" style="background:var(--purple)"></div>LinkedIn Ads</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--purple)"></div>Google PPC</div>
-          <div class="skill-pill"><div class="indicator" style="background:var(--purple)"></div>SEO / Content Ops</div>
-        </div>
-      </div>
+  <div class="sec-inner">
+    <div class="sec-eyebrow">Toolkit</div>
+    <h2 class="sec-heading">Skills <em>&amp; Technologies</em></h2>
+    <div class="sec-desc">Analytics, automation, and strategic marketing operations.</div>
+    <div class="sk-groups">
+      <div class="reveal"><div class="sk-label">BI &amp; Analytics</div><div class="sk-row">
+        <div class="sk-pill">Power BI / DAX</div><div class="sk-pill">Google Analytics 4</div><div class="sk-pill">Pipeline Forecasting</div><div class="sk-pill">Cohort Analysis</div><div class="sk-pill">A/B Testing</div>
+      </div></div>
+      <div class="reveal reveal-d1"><div class="sk-label">Marketing Ops &amp; CRM</div><div class="sk-row">
+        <div class="sk-pill">Adobe Marketo</div><div class="sk-pill">MS Dynamics 365</div><div class="sk-pill">ActiveCampaign</div><div class="sk-pill">Multi-Touch Attribution</div><div class="sk-pill">ABM Strategy</div>
+      </div></div>
+      <div class="reveal reveal-d1"><div class="sk-label">Data Engineering</div><div class="sk-row">
+        <div class="sk-pill">SQL</div><div class="sk-pill">ETL Pipeline Design</div><div class="sk-pill">Dimensional Modelling</div><div class="sk-pill">Excel / VBA</div><div class="sk-pill">OKR / KPI Frameworks</div>
+      </div></div>
+      <div class="reveal reveal-d2"><div class="sk-label">Channels</div><div class="sk-row">
+        <div class="sk-pill">LinkedIn Ads</div><div class="sk-pill">Google PPC</div><div class="sk-pill">SEO / Content Ops</div>
+      </div></div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════ EXPERIENCE — ORBITAL TIMELINE (21st.dev) ═══════════════════ -->
+<div class="divider"></div>
+
+<!-- EXPERIENCE — ORBITAL TIMELINE -->
 <section id="experience">
-  <div class="section-inner">
-    <div class="section-eyebrow">Career Journey</div>
-    <h2 class="section-heading">Experience <em>Timeline</em></h2>
-    <div class="section-desc">Click any orbital node to explore the role. Connected nodes pulse to show career progression.</div>
-    <div class="orbital-section">
-      <div class="orbital-container" id="orbitalContainer">
-        <!-- Orbit Rings -->
-        <div class="orbit-ring orbit-ring-1"></div>
-        <div class="orbit-ring orbit-ring-2"></div>
-        <div class="orbit-ring orbit-ring-3"></div>
-        <!-- Center -->
-        <div class="orbital-center"><div class="orbital-core"></div></div>
-        <!-- Nodes injected by JS -->
+  <div class="sec-inner">
+    <div class="sec-eyebrow">Career</div>
+    <h2 class="sec-heading">Experience <em>Timeline</em></h2>
+    <div class="sec-desc">Click any node to explore. Connected nodes pulse to show progression.</div>
+    <div class="orbital-layout">
+      <div class="orbital-box" id="orbitalBox">
+        <div class="o-ring o-ring-1"></div><div class="o-ring o-ring-2"></div><div class="o-ring o-ring-3"></div>
+        <div class="orbital-center"><div class="o-core"></div></div>
       </div>
-      <div class="orbital-detail" id="orbitalDetail">
-        <div class="detail-panel">
-          <div class="detail-placeholder" id="detailPlaceholder">
-            <div class="detail-placeholder-icon">&#128260;</div>
-            <div class="detail-placeholder-text">Click an orbital node to explore role details, achievements, and career connections.</div>
-          </div>
-          <div id="detailContent" style="display:none"></div>
+      <div class="o-detail" id="oDetail">
+        <div class="o-panel">
+          <div class="o-placeholder" id="oPlaceholder"><div class="o-placeholder-icon">&#9673;</div><div class="o-placeholder-text">Click a node to explore</div></div>
+          <div id="oContent" style="display:none"></div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════ PROJECTS ═══════════════════ -->
+<div class="divider"></div>
+
+<!-- PROJECTS -->
 <section id="projects">
-  <div class="section-inner">
-    <div class="section-eyebrow">Real Work &middot; Real Data &middot; Real Impact</div>
-    <h2 class="section-heading">Analytics <em>Projects</em></h2>
-    <div class="section-desc">Four standalone interactive dashboards. Click any project to explore the full dashboard right here.</div>
-    <div class="projects-grid">
+  <div class="sec-inner">
+    <div class="sec-eyebrow">Work</div>
+    <h2 class="sec-heading">Analytics <em>Projects</em></h2>
+    <div class="sec-desc">Interactive dashboards built from real work. Click to explore.</div>
+    <div class="proj-grid">
 
-      <!-- P1 -->
-      <div class="proj-card reveal" data-accent="neon" onclick="openProject(0)">
+      <div class="proj-card reveal" onclick="openProject(0)">
         <div class="proj-inner">
-          <div class="proj-num" style="color:var(--neon)">PROJECT 01 &middot; REVENUE OPERATIONS</div>
-          <div class="proj-head">
-            <div class="proj-icon" style="background:rgba(0,245,212,.06)">&#128202;</div>
-            <span class="proj-badge" style="background:rgba(34,197,94,.06);color:#22C55E;border:1px solid rgba(34,197,94,.15)">LIVE</span>
-          </div>
+          <div class="proj-num">01 &mdash; REVENUE OPERATIONS</div>
+          <div class="proj-head"><div class="proj-icon">&#128202;</div><span class="proj-badge">LIVE</span></div>
           <div class="proj-name">Full-Funnel RevOps Dashboard</div>
-          <div class="proj-summary">Consolidates 6 data sources into a unified executive pipeline analytics layer. Tracks MQL &rarr; SQL &rarr; Opportunity &rarr; Closed Won.</div>
-          <div class="proj-chart-wrap"><canvas id="c1"></canvas></div>
-          <div class="proj-insight"><span class="proj-insight-tag" style="color:var(--neon)">TOP FINDING</span><strong>Organic search</strong> generates 34% of MQLs but drives 41% of revenue — highest ROI channel at $1,380/lead.</div>
-          <div class="proj-kpis">
-            <div class="proj-kpi"><div class="num" style="color:var(--neon)">$4.2M</div><div class="lbl">PIPELINE</div></div>
-            <div class="proj-kpi"><div class="num" style="color:var(--hot)">3,842</div><div class="lbl">MQLs</div></div>
-            <div class="proj-kpi"><div class="num" style="color:var(--volt)">6</div><div class="lbl">SOURCES</div></div>
-          </div>
-          <div class="proj-tech">
-            <span class="proj-tech-tag" style="background:rgba(0,245,212,.06);color:var(--neon)">Power BI</span>
-            <span class="proj-tech-tag" style="background:rgba(247,37,133,.06);color:var(--hot)">Marketo</span>
-            <span class="proj-tech-tag" style="background:rgba(173,255,47,.06);color:var(--volt)">ETL</span>
-            <span class="proj-tech-tag" style="background:rgba(199,125,255,.06);color:var(--purple)">Dynamics</span>
-          </div>
+          <div class="proj-summary">Consolidates 6 data sources into unified executive pipeline analytics. Tracks MQL &rarr; SQL &rarr; Opportunity &rarr; Closed Won.</div>
+          <div class="proj-chart"><canvas id="c1"></canvas></div>
+          <div class="proj-insight"><span class="proj-insight-tag">KEY INSIGHT</span><strong>Organic search</strong> generates 34% of MQLs but drives 41% of revenue &mdash; highest ROI at $1,380/lead.</div>
+          <div class="proj-kpis"><div class="proj-kpi"><div class="num">$4.2M</div><div class="lbl">PIPELINE</div></div><div class="proj-kpi"><div class="num">3,842</div><div class="lbl">MQLs</div></div><div class="proj-kpi"><div class="num">6</div><div class="lbl">SOURCES</div></div></div>
+          <div class="proj-tech"><span class="proj-tech-tag">Power BI</span><span class="proj-tech-tag">Marketo</span><span class="proj-tech-tag">ETL</span><span class="proj-tech-tag">Dynamics</span></div>
         </div>
-        <div class="proj-footer">
-          <button class="proj-cta neon" onclick="event.stopPropagation();openProject(0)">Explore <span class="arrow">&rarr;</span></button>
-          <span class="proj-complexity">6 charts &middot; 6 KPIs</span>
-        </div>
+        <div class="proj-foot"><button class="proj-cta" onclick="event.stopPropagation();openProject(0)">Explore <span class="arrow">&rarr;</span></button><span class="proj-complexity">6 charts &middot; 6 KPIs</span></div>
       </div>
 
-      <!-- P2 -->
-      <div class="proj-card reveal" data-accent="hot" onclick="openProject(1)">
+      <div class="proj-card reveal" onclick="openProject(1)">
         <div class="proj-inner">
-          <div class="proj-num" style="color:var(--hot)">PROJECT 02 &middot; MARKETING ANALYTICS</div>
-          <div class="proj-head">
-            <div class="proj-icon" style="background:rgba(247,37,133,.06)">&#127919;</div>
-            <span class="proj-badge" style="background:rgba(247,37,133,.06);color:var(--hot);border:1px solid rgba(247,37,133,.15)">3 MODELS</span>
-          </div>
+          <div class="proj-num">02 &mdash; MARKETING ANALYTICS</div>
+          <div class="proj-head"><div class="proj-icon">&#127919;</div><span class="proj-badge">3 MODELS</span></div>
           <div class="proj-name">Multi-Touch Attribution Framework</div>
-          <div class="proj-summary">3 attribution models on $2.4M of closed revenue across 8 channels. Revealed LinkedIn was under-credited by 18pp.</div>
-          <div class="proj-chart-wrap"><canvas id="c2"></canvas></div>
-          <div class="proj-insight" style="background:rgba(247,37,133,.02);border-color:rgba(247,37,133,.06)"><span class="proj-insight-tag" style="color:var(--hot)">TOP FINDING</span>Last-touch attribution <strong>under-credits awareness channels by 40-60%</strong>, leading to misallocated spend.</div>
-          <div class="proj-kpis">
-            <div class="proj-kpi"><div class="num" style="color:var(--hot)">$2.4M</div><div class="lbl">ATTRIBUTED</div></div>
-            <div class="proj-kpi"><div class="num" style="color:var(--neon)">3.2x</div><div class="lbl">ROAS</div></div>
-            <div class="proj-kpi"><div class="num" style="color:var(--volt)">6.3</div><div class="lbl">TOUCHPOINTS</div></div>
-          </div>
-          <div class="proj-tech">
-            <span class="proj-tech-tag" style="background:rgba(247,37,133,.06);color:var(--hot)">Attribution</span>
-            <span class="proj-tech-tag" style="background:rgba(0,245,212,.06);color:var(--neon)">SQL</span>
-            <span class="proj-tech-tag" style="background:rgba(173,255,47,.06);color:var(--volt)">Power BI</span>
-          </div>
+          <div class="proj-summary">3 attribution models on $2.4M closed revenue across 8 channels. Revealed LinkedIn under-credited by 18pp.</div>
+          <div class="proj-chart"><canvas id="c2"></canvas></div>
+          <div class="proj-insight"><span class="proj-insight-tag">KEY INSIGHT</span>Last-touch attribution <strong>under-credits awareness channels by 40-60%</strong>, misallocating spend.</div>
+          <div class="proj-kpis"><div class="proj-kpi"><div class="num">$2.4M</div><div class="lbl">ATTRIBUTED</div></div><div class="proj-kpi"><div class="num">3.2x</div><div class="lbl">ROAS</div></div><div class="proj-kpi"><div class="num">6.3</div><div class="lbl">TOUCHPOINTS</div></div></div>
+          <div class="proj-tech"><span class="proj-tech-tag">Attribution</span><span class="proj-tech-tag">SQL</span><span class="proj-tech-tag">Power BI</span></div>
         </div>
-        <div class="proj-footer">
-          <button class="proj-cta hot" onclick="event.stopPropagation();openProject(1)">Explore <span class="arrow">&rarr;</span></button>
-          <span class="proj-complexity">5 charts &middot; buyer journeys</span>
-        </div>
+        <div class="proj-foot"><button class="proj-cta" onclick="event.stopPropagation();openProject(1)">Explore <span class="arrow">&rarr;</span></button><span class="proj-complexity">5 charts &middot; journeys</span></div>
       </div>
 
-      <!-- P3 -->
-      <div class="proj-card reveal" data-accent="volt" onclick="openProject(2)">
+      <div class="proj-card reveal" onclick="openProject(2)">
         <div class="proj-inner">
-          <div class="proj-num" style="color:var(--volt)">PROJECT 03 &middot; ETL &middot; AUTOMATION</div>
-          <div class="proj-head">
-            <div class="proj-icon" style="background:rgba(173,255,47,.06)">&#9889;</div>
-            <span class="proj-badge" style="background:rgba(173,255,47,.06);color:var(--volt);border:1px solid rgba(173,255,47,.15)">24/7</span>
-          </div>
+          <div class="proj-num">03 &mdash; ETL / AUTOMATION</div>
+          <div class="proj-head"><div class="proj-icon">&#9889;</div><span class="proj-badge">24/7</span></div>
           <div class="proj-name">Campaign Performance Engine</div>
-          <div class="proj-summary">End-to-end ETL pipeline replacing 40hrs/month of manual reporting. Processes 50K+ rows daily. Decision latency from 5 days to &lt;24hrs.</div>
-          <div class="proj-chart-wrap"><canvas id="c3"></canvas></div>
-          <div class="proj-insight" style="background:rgba(173,255,47,.02);border-color:rgba(173,255,47,.06)"><span class="proj-insight-tag" style="color:var(--volt)">TOP FINDING</span><strong>Webinar campaigns were generating 478% ROI</strong> but receiving only 8% of budget.</div>
-          <div class="proj-kpis">
-            <div class="proj-kpi"><div class="num" style="color:var(--volt)">342%</div><div class="lbl">ROI</div></div>
-            <div class="proj-kpi"><div class="num" style="color:var(--neon)">50K+</div><div class="lbl">ROWS/DAY</div></div>
-            <div class="proj-kpi"><div class="num" style="color:var(--hot)">99.8%</div><div class="lbl">UPTIME</div></div>
-          </div>
-          <div class="proj-tech">
-            <span class="proj-tech-tag" style="background:rgba(173,255,47,.06);color:var(--volt)">ETL</span>
-            <span class="proj-tech-tag" style="background:rgba(0,245,212,.06);color:var(--neon)">Dimensional</span>
-            <span class="proj-tech-tag" style="background:rgba(247,37,133,.06);color:var(--hot)">Power BI</span>
-          </div>
+          <div class="proj-summary">End-to-end ETL pipeline replacing 40hrs/month of reporting. 50K+ rows daily. Decision latency from 5 days to &lt;24hrs.</div>
+          <div class="proj-chart"><canvas id="c3"></canvas></div>
+          <div class="proj-insight"><span class="proj-insight-tag">KEY INSIGHT</span><strong>Webinar campaigns generating 478% ROI</strong> but receiving only 8% of budget.</div>
+          <div class="proj-kpis"><div class="proj-kpi"><div class="num">342%</div><div class="lbl">ROI</div></div><div class="proj-kpi"><div class="num">50K+</div><div class="lbl">ROWS/DAY</div></div><div class="proj-kpi"><div class="num">99.8%</div><div class="lbl">UPTIME</div></div></div>
+          <div class="proj-tech"><span class="proj-tech-tag">ETL</span><span class="proj-tech-tag">Dimensional</span><span class="proj-tech-tag">Power BI</span></div>
         </div>
-        <div class="proj-footer">
-          <button class="proj-cta volt" onclick="event.stopPropagation();openProject(2)">Explore <span class="arrow">&rarr;</span></button>
-          <span class="proj-complexity">ETL viz &middot; live log</span>
-        </div>
+        <div class="proj-foot"><button class="proj-cta" onclick="event.stopPropagation();openProject(2)">Explore <span class="arrow">&rarr;</span></button><span class="proj-complexity">ETL viz &middot; live log</span></div>
       </div>
 
-      <!-- P4 -->
-      <div class="proj-card reveal" data-accent="purple" onclick="openProject(3)">
+      <div class="proj-card reveal" onclick="openProject(3)">
         <div class="proj-inner">
-          <div class="proj-num" style="color:var(--purple)">PROJECT 04 &middot; PREDICTIVE ANALYTICS</div>
-          <div class="proj-head">
-            <div class="proj-icon" style="background:rgba(199,125,255,.06)">&#128300;</div>
-            <span class="proj-badge" style="background:rgba(199,125,255,.06);color:var(--purple);border:1px solid rgba(199,125,255,.15)">78.4%</span>
-          </div>
+          <div class="proj-num">04 &mdash; PREDICTIVE ANALYTICS</div>
+          <div class="proj-head"><div class="proj-icon">&#128300;</div><span class="proj-badge">78.4%</span></div>
           <div class="proj-name">Lead Scoring &amp; Cohort Analysis</div>
-          <div class="proj-summary">15-signal weighted scoring model that identifies high-probability leads. Score 80+ leads convert at 34.2% — 4.7x the base rate.</div>
-          <div class="proj-chart-wrap"><canvas id="c4"></canvas></div>
-          <div class="proj-insight" style="background:rgba(199,125,255,.02);border-color:rgba(199,125,255,.06)"><span class="proj-insight-tag" style="color:var(--purple)">TOP FINDING</span><strong>Enterprise retained 68% at Month 6 vs SMB's 24%</strong> — a 2.8x retention gap.</div>
-          <div class="proj-kpis">
-            <div class="proj-kpi"><div class="num" style="color:var(--purple)">+18%</div><div class="lbl">PIPELINE</div></div>
-            <div class="proj-kpi"><div class="num" style="color:var(--neon)">34.2%</div><div class="lbl">TOP CONV</div></div>
-            <div class="proj-kpi"><div class="num" style="color:var(--hot)">3,842</div><div class="lbl">SCORED</div></div>
-          </div>
-          <div class="proj-tech">
-            <span class="proj-tech-tag" style="background:rgba(199,125,255,.06);color:var(--purple)">Scoring</span>
-            <span class="proj-tech-tag" style="background:rgba(0,245,212,.06);color:var(--neon)">Cohort</span>
-            <span class="proj-tech-tag" style="background:rgba(247,37,133,.06);color:var(--hot)">Marketo</span>
-          </div>
+          <div class="proj-summary">15-signal scoring model. Score 80+ leads convert at 34.2% &mdash; 4.7x the base rate.</div>
+          <div class="proj-chart"><canvas id="c4"></canvas></div>
+          <div class="proj-insight"><span class="proj-insight-tag">KEY INSIGHT</span><strong>Enterprise retained 68% at Month 6 vs SMB 24%</strong> &mdash; 2.8x retention gap.</div>
+          <div class="proj-kpis"><div class="proj-kpi"><div class="num">+18%</div><div class="lbl">PIPELINE</div></div><div class="proj-kpi"><div class="num">34.2%</div><div class="lbl">CONV</div></div><div class="proj-kpi"><div class="num">3,842</div><div class="lbl">SCORED</div></div></div>
+          <div class="proj-tech"><span class="proj-tech-tag">Scoring</span><span class="proj-tech-tag">Cohort</span><span class="proj-tech-tag">Marketo</span></div>
         </div>
-        <div class="proj-footer">
-          <button class="proj-cta purple" onclick="event.stopPropagation();openProject(3)">Explore <span class="arrow">&rarr;</span></button>
-          <span class="proj-complexity">scoring &middot; cohort heatmap</span>
-        </div>
+        <div class="proj-foot"><button class="proj-cta" onclick="event.stopPropagation();openProject(3)">Explore <span class="arrow">&rarr;</span></button><span class="proj-complexity">scoring &middot; heatmap</span></div>
       </div>
 
     </div>
   </div>
 </section>
 
-<!-- PROJECT VIEWER -->
-<div class="project-viewer" id="projectViewer">
+<!-- VIEWER -->
+<div class="viewer" id="viewer">
   <div class="viewer-bar">
-    <div class="viewer-info"><div class="viewer-title" id="viewerTitle">Dashboard</div><div class="viewer-sub" id="viewerSub">PROJECT 01</div></div>
-    <div class="viewer-tabs" id="viewerTabs">
-      <button class="viewer-tab active" onclick="switchProject(0)">01 RevOps</button>
-      <button class="viewer-tab" onclick="switchProject(1)">02 Attribution</button>
-      <button class="viewer-tab" onclick="switchProject(2)">03 Campaign</button>
-      <button class="viewer-tab" onclick="switchProject(3)">04 Scoring</button>
+    <div class="viewer-info"><div class="viewer-title" id="vTitle"></div><div class="viewer-sub" id="vSub"></div></div>
+    <div class="viewer-tabs" id="vTabs">
+      <button class="viewer-tab active" onclick="switchProject(0)">01</button>
+      <button class="viewer-tab" onclick="switchProject(1)">02</button>
+      <button class="viewer-tab" onclick="switchProject(2)">03</button>
+      <button class="viewer-tab" onclick="switchProject(3)">04</button>
     </div>
-    <button class="viewer-close" onclick="closeViewer()" title="Close">&times;</button>
+    <button class="viewer-close" onclick="closeViewer()">&times;</button>
   </div>
-  <div class="viewer-frame-wrap"><iframe id="viewerFrame" title="Project Dashboard"></iframe></div>
+  <div class="viewer-frame"><iframe id="vFrame" title="Dashboard"></iframe></div>
 </div>
+
+<div class="divider"></div>
 
 <!-- CONTACT -->
 <section id="contact">
-  <div class="section-inner">
-    <div class="contact-layout">
-      <div class="contact-cta reveal">
-        <div class="section-eyebrow">Let's Connect</div>
-        <h2>Ready to drive <span style="color:var(--neon)">revenue</span> with data?</h2>
-        <p>Actively seeking Revenue Operations, Marketing Analytics, and BI roles at high-growth companies. 2.5+ years of hands-on experience building the exact infrastructure data-driven companies need.</p>
-        <a href="mailto:tanmoyacharjee661@gmail.com" class="btn-primary">Send Email &rarr;</a>
+  <div class="sec-inner">
+    <div class="contact-grid">
+      <div class="contact-heading reveal">
+        <div class="sec-eyebrow">Contact</div>
+        <h2>Let's build something <span style="color:#fff">together</span></h2>
+        <p>Seeking Revenue Operations, Marketing Analytics, and BI roles at high-growth companies.</p>
+        <a href="mailto:tanmoyacharjee661@gmail.com" class="btn-w">Send Email &rarr;</a>
       </div>
       <div class="contact-cards reveal reveal-d1">
-        <a href="mailto:tanmoyacharjee661@gmail.com" class="contact-card"><div class="contact-card-icon">&#9993;</div><span class="contact-card-info"><span class="contact-card-label">EMAIL</span><span class="contact-card-val">tanmoyacharjee661@gmail.com</span></span></a>
-        <a href="tel:+916291046523" class="contact-card"><div class="contact-card-icon">&#128241;</div><span class="contact-card-info"><span class="contact-card-label">PHONE</span><span class="contact-card-val">+91-62910-46523</span></span></a>
-        <a href="https://linkedin.com/in/tanmoy-ab54154213" target="_blank" class="contact-card"><div class="contact-card-icon">&#128188;</div><span class="contact-card-info"><span class="contact-card-label">LINKEDIN</span><span class="contact-card-val">linkedin.com/in/tanmoy-ab54154213</span></span></a>
-        <div class="contact-card"><div class="contact-card-icon">&#128205;</div><span class="contact-card-info"><span class="contact-card-label">LOCATION</span><span class="contact-card-val">Barrackpore, West Bengal, India</span></span></div>
+        <a href="mailto:tanmoyacharjee661@gmail.com" class="c-card"><div class="c-card-icon">&#9993;</div><span class="c-card-info"><span class="c-card-label">EMAIL</span><span class="c-card-val">tanmoyacharjee661@gmail.com</span></span></a>
+        <a href="tel:+916291046523" class="c-card"><div class="c-card-icon">&#128241;</div><span class="c-card-info"><span class="c-card-label">PHONE</span><span class="c-card-val">+91-62910-46523</span></span></a>
+        <a href="https://linkedin.com/in/tanmoy-ab54154213" target="_blank" class="c-card"><div class="c-card-icon">&#128188;</div><span class="c-card-info"><span class="c-card-label">LINKEDIN</span><span class="c-card-val">linkedin.com/in/tanmoy-ab54154213</span></span></a>
+        <div class="c-card"><div class="c-card-icon">&#128205;</div><span class="c-card-info"><span class="c-card-label">LOCATION</span><span class="c-card-val">Barrackpore, West Bengal, India</span></span></div>
       </div>
     </div>
   </div>
 </section>
 
-<footer>
-  <p>&copy; 2025 Tanmoy Acharjee &middot; Revenue &amp; Marketing Analytics</p>
-  <p>Built with data-driven precision</p>
-</footer>
-
-<button class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Top">&#8593;</button>
+<footer><p>&copy; 2025 Tanmoy Acharjee</p><p>Revenue &amp; Marketing Analytics</p></footer>
+<button class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
 
 <script>
-/* ═══════════════════ PRELOADER ═══════════════════ */
-window.addEventListener('load',()=>setTimeout(()=>document.getElementById('preloader').classList.add('done'),700));
+/* ═══ PRELOADER ═══ */
+window.addEventListener('load',()=>setTimeout(()=>document.getElementById('preloader').classList.add('done'),800));
 
-/* ═══════════════════ CANVAS TRAIL EFFECT (21st.dev port) ═══════════════════ */
+/* ═══ WEBGL SHADER (21st.dev — Three.js) ═══ */
 (function(){
-  var ctx,f,e=0,pos={x:0,y:0},lines=[],
-      E={friction:.5,trails:80,size:50,dampening:.025,tension:.99};
+  const c=document.getElementById('shaderCanvas');if(!c)return;
+  const vs=`attribute vec3 position;void main(){gl_Position=vec4(position,1.0);}`;
+  const fs=`precision highp float;uniform vec2 resolution;uniform float time;uniform float xScale;uniform float yScale;uniform float distortion;void main(){vec2 p=(gl_FragCoord.xy*2.0-resolution)/min(resolution.x,resolution.y);float d=length(p)*distortion;float rx=p.x*(1.0+d);float gx=p.x;float bx=p.x*(1.0-d);float r=0.05/abs(p.y+sin((rx+time)*xScale)*yScale);float g=0.05/abs(p.y+sin((gx+time)*xScale)*yScale);float b=0.05/abs(p.y+sin((bx+time)*xScale)*yScale);gl_FragColor=vec4(r,g,b,1.0);}`;
+  const scene=new THREE.Scene();
+  const renderer=new THREE.WebGLRenderer({canvas:c});
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setClearColor(new THREE.Color(0x000000));
+  const camera=new THREE.OrthographicCamera(-1,1,1,-1,0,-1);
+  const uniforms={resolution:{value:[innerWidth,innerHeight]},time:{value:0},xScale:{value:1},yScale:{value:.5},distortion:{value:.05}};
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(new Float32Array([-1,-1,0,1,-1,0,-1,1,0,1,-1,0,-1,1,0,1,1,0]),3));
+  const mat=new THREE.RawShaderMaterial({vertexShader:vs,fragmentShader:fs,uniforms,side:THREE.DoubleSide});
+  scene.add(new THREE.Mesh(geo,mat));
+  function resize(){renderer.setSize(innerWidth,innerHeight,false);uniforms.resolution.value=[innerWidth,innerHeight]}
+  resize();window.addEventListener('resize',resize);
+  (function anim(){uniforms.time.value+=.01;renderer.render(scene,camera);requestAnimationFrame(anim)})();
+})();
+
+/* ═══ CANVAS TRAIL (faster, more reactive) ═══ */
+(function(){
+  var ctx,f,e=0,pos={x:innerWidth/2,y:innerHeight/2},lines=[],
+      E={friction:.45,trails:60,size:80,dampening:.04,tension:.98};
   function Osc(o){this.phase=o.phase||0;this.offset=o.offset||0;this.frequency=o.frequency||.001;this.amplitude=o.amplitude||1}
   Osc.prototype.update=function(){this.phase+=this.frequency;e=this.offset+Math.sin(this.phase)*this.amplitude;return e};
   function Node(){this.x=0;this.y=0;this.vx=0;this.vy=0}
   function Line(o){this.spring=o.spring+.1*Math.random()-.05;this.friction=E.friction+.01*Math.random()-.005;this.nodes=[];for(var i=0;i<E.size;i++){var n=new Node();n.x=pos.x;n.y=pos.y;this.nodes.push(n)}}
-  Line.prototype.update=function(){var s=this.spring,t=this.nodes[0];t.vx+=(pos.x-t.x)*s;t.vy+=(pos.y-t.y)*s;for(var i=0,len=this.nodes.length;i<len;i++){t=this.nodes[i];if(i>0){var n=this.nodes[i-1];t.vx+=(n.x-t.x)*s;t.vy+=(n.y-t.y)*s;t.vx+=n.vx*E.dampening;t.vy+=n.vy*E.dampening}t.vx*=this.friction;t.vy*=this.friction;t.x+=t.vx;t.y+=t.vy;s*=E.tension}};
+  Line.prototype.update=function(){var s=this.spring,t=this.nodes[0];t.vx+=(pos.x-t.x)*s;t.vy+=(pos.y-t.y)*s;for(var i=0;i<this.nodes.length;i++){t=this.nodes[i];if(i>0){var n=this.nodes[i-1];t.vx+=(n.x-t.x)*s;t.vy+=(n.y-t.y)*s;t.vx+=n.vx*E.dampening;t.vy+=n.vy*E.dampening}t.vx*=this.friction;t.vy*=this.friction;t.x+=t.vx;t.y+=t.vy;s*=E.tension}};
   Line.prototype.draw=function(){var n=this.nodes[0].x,o=this.nodes[0].y;ctx.beginPath();ctx.moveTo(n,o);for(var i=1,len=this.nodes.length-2;i<len;i++){var a=this.nodes[i],b=this.nodes[i+1];n=.5*(a.x+b.x);o=.5*(a.y+b.y);ctx.quadraticCurveTo(a.x,a.y,n,o)}a=this.nodes[i];b=this.nodes[i+1];ctx.quadraticCurveTo(a.x,a.y,b.x,b.y);ctx.stroke();ctx.closePath()};
-  function initLines(){lines=[];for(var i=0;i<E.trails;i++)lines.push(new Line({spring:.45+(i/E.trails)*.025}))}
-  function onMove(ev){document.removeEventListener('mousemove',onMove);document.removeEventListener('touchstart',onMove);function c(ev){ev.touches?(pos.x=ev.touches[0].pageX,pos.y=ev.touches[0].pageY):(pos.x=ev.clientX,pos.y=ev.clientY)}document.addEventListener('mousemove',c);document.addEventListener('touchmove',c);document.addEventListener('touchstart',function(ev){if(ev.touches.length===1){pos.x=ev.touches[0].pageX;pos.y=ev.touches[0].pageY}});c(ev);initLines();render()}
-  function render(){if(!ctx||!ctx.running)return;ctx.globalCompositeOperation='source-over';ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.globalCompositeOperation='lighter';ctx.strokeStyle='hsla('+Math.round(f.update())+',100%,50%,0.025)';ctx.lineWidth=10;for(var i=0;i<E.trails;i++){lines[i].update();lines[i].draw()}ctx.frame++;window.requestAnimationFrame(render)}
-  function resize(){ctx.canvas.width=window.innerWidth;ctx.canvas.height=window.innerHeight}
-  window.addEventListener('load',function(){var c=document.getElementById('canvas');if(!c)return;ctx=c.getContext('2d');ctx.running=true;ctx.frame=1;f=new Osc({phase:Math.random()*2*Math.PI,amplitude:85,frequency:.0015,offset:285});document.addEventListener('mousemove',onMove);document.addEventListener('touchstart',onMove);window.addEventListener('resize',resize);resize()});
+  function initLines(){lines=[];for(var i=0;i<E.trails;i++)lines.push(new Line({spring:.5+(i/E.trails)*.03}))}
+  var started=false;
+  function onMove(ev){
+    if(!started){started=true;document.removeEventListener('mousemove',onMove);document.removeEventListener('touchstart',onMove);
+    function c(ev){if(ev.touches){pos.x=ev.touches[0].pageX;pos.y=ev.touches[0].pageY}else{pos.x=ev.clientX;pos.y=ev.clientY}}
+    document.addEventListener('mousemove',c);document.addEventListener('touchmove',c);document.addEventListener('touchstart',function(ev){if(ev.touches.length===1){pos.x=ev.touches[0].pageX;pos.y=ev.touches[0].pageY}});c(ev);initLines();render();}
+  }
+  function render(){if(!ctx||!ctx.running)return;ctx.globalCompositeOperation='source-over';ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.globalCompositeOperation='lighter';ctx.strokeStyle='hsla('+Math.round(f.update())+',50%,50%,0.02)';ctx.lineWidth=8;for(var i=0;i<E.trails;i++){lines[i].update();lines[i].draw()}ctx.frame++;requestAnimationFrame(render)}
+  function resize(){ctx.canvas.width=innerWidth;ctx.canvas.height=innerHeight}
+  window.addEventListener('load',function(){var c=document.getElementById('trailCanvas');if(!c)return;ctx=c.getContext('2d');ctx.running=true;ctx.frame=1;f=new Osc({phase:Math.random()*2*Math.PI,amplitude:85,frequency:.002,offset:285});document.addEventListener('mousemove',onMove);document.addEventListener('touchstart',onMove);window.addEventListener('resize',resize);resize()});
 })();
 
-/* ═══════════════════ NAV ═══════════════════ */
-const navEl=document.querySelector('nav'),secEls=document.querySelectorAll('section[id]'),navAs=document.querySelectorAll('.nav-links a');
+/* ═══ NAV ═══ */
+const navEl=document.querySelector('nav'),secs=document.querySelectorAll('section[id]'),navAs=document.querySelectorAll('.nav-links a');
 window.addEventListener('scroll',()=>{
-  navEl.classList.toggle('scrolled',scrollY>40);
-  document.getElementById('btt').classList.toggle('show',scrollY>500);
-  let cur='';secEls.forEach(s=>{if(scrollY>=s.offsetTop-200)cur=s.id});
+  navEl.classList.toggle('scrolled',scrollY>30);
+  document.getElementById('btt').classList.toggle('show',scrollY>400);
+  let cur='';secs.forEach(s=>{if(scrollY>=s.offsetTop-180)cur=s.id});
   navAs.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur));
 });
 document.getElementById('mobileToggle').addEventListener('click',()=>document.getElementById('navLinks').classList.toggle('open'));
 navAs.forEach(a=>a.addEventListener('click',()=>document.getElementById('navLinks').classList.remove('open')));
 
-/* ═══════════════════ TYPING ═══════════════════ */
+/* ═══ TYPING ═══ */
 const roles=['RevOps Specialist','BI Architect','Marketing Analyst','Data Strategist','Campaign Engineer'];
 let ri=0,ci=0,del=false;const typed=document.getElementById('typedRole');
-function typeLoop(){const w=roles[ri];if(!del){typed.textContent=w.slice(0,ci+1);ci++;if(ci===w.length){del=true;setTimeout(typeLoop,2200);return}}else{typed.textContent=w.slice(0,ci-1);ci--;if(ci===0){del=false;ri=(ri+1)%roles.length}}setTimeout(typeLoop,del?45:85)}
+function typeLoop(){const w=roles[ri];if(!del){typed.innerHTML='<span>'+w.slice(0,ci+1)+'</span>';ci++;if(ci===w.length){del=true;setTimeout(typeLoop,2000);return}}else{typed.innerHTML='<span>'+w.slice(0,ci-1)+'</span>';ci--;if(ci===0){del=false;ri=(ri+1)%roles.length}}setTimeout(typeLoop,del?40:75)}
 typeLoop();
 
-/* ═══════════════════ COUNTUP ═══════════════════ */
-function countUp(el){const t=+el.dataset.target;let c=0;const s=Math.ceil(t/45),sfx=el.querySelector('span')?el.querySelector('span').outerHTML:'';const iv=setInterval(()=>{c=Math.min(c+s,t);el.innerHTML=c+(sfx||'');if(c>=t)clearInterval(iv)},30)}
-
-/* ═══════════════════ INTERSECTION OBSERVER ═══════════════════ */
-const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');e.target.querySelectorAll('[data-target]').forEach(n=>countUp(n))}})},{threshold:.1});
+/* ═══ COUNTUP ═══ */
+function countUp(el){const t=+el.dataset.target;let c=0;const s=Math.ceil(t/40),sfx=el.querySelector('span')?el.querySelector('span').outerHTML:'';const iv=setInterval(()=>{c=Math.min(c+s,t);el.innerHTML=c+(sfx||'');if(c>=t)clearInterval(iv)},28)}
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');e.target.querySelectorAll('[data-target]').forEach(n=>countUp(n))}})},{threshold:.08});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-/* ═══════════════════ CHARTS ═══════════════════ */
-const cBase={responsive:true,maintainAspectRatio:false,animation:{duration:1200,easing:'easeOutQuart'},plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}};
-new Chart(document.getElementById('c1'),{type:'bar',data:{labels:['Jan','Mar','May','Jul','Sep','Nov'],datasets:[{data:[280,340,380,420,490,510],backgroundColor:'rgba(0,245,212,.15)',borderColor:'#00F5D4',borderWidth:1.5,borderRadius:4},{data:[85,105,118,135,162,180],backgroundColor:'rgba(247,37,133,.15)',borderColor:'#F72585',borderWidth:1.5,borderRadius:4}]},options:cBase});
-new Chart(document.getElementById('c2'),{type:'doughnut',data:{labels:['LinkedIn','Google','Organic','Email','Webinar','Other'],datasets:[{data:[28,19,16,22,11,4],backgroundColor:['rgba(247,37,133,.7)','rgba(0,245,212,.7)','rgba(173,255,47,.7)','rgba(255,107,53,.7)','rgba(199,125,255,.7)','rgba(100,116,139,.4)'],borderWidth:0}]},options:{...cBase,cutout:'70%'}});
-new Chart(document.getElementById('c3'),{type:'line',data:{labels:['Jan','Mar','May','Jul','Sep','Nov'],datasets:[{data:[165,195,235,255,310,342],borderColor:'#ADFF2F',backgroundColor:'rgba(173,255,47,.04)',tension:.4,fill:true,pointRadius:2.5,pointBackgroundColor:'#ADFF2F'}]},options:cBase});
-new Chart(document.getElementById('c4'),{type:'bar',data:{labels:['0-20','21-40','41-60','61-80','81-100'],datasets:[{data:[1.2,5.2,12.4,22.7,34.2],backgroundColor:['rgba(247,37,133,.35)','rgba(247,37,133,.45)','rgba(0,245,212,.35)','rgba(0,245,212,.55)','rgba(173,255,47,.65)'],borderRadius:4}]},options:cBase});
+/* ═══ CHARTS (monochrome) ═══ */
+const cB={responsive:true,maintainAspectRatio:false,animation:{duration:1000},plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}};
+new Chart(document.getElementById('c1'),{type:'bar',data:{labels:['J','M','M','J','S','N'],datasets:[{data:[280,340,380,420,490,510],backgroundColor:'rgba(255,255,255,.06)',borderColor:'rgba(255,255,255,.15)',borderWidth:1,borderRadius:3},{data:[85,105,118,135,162,180],backgroundColor:'rgba(255,255,255,.03)',borderColor:'rgba(255,255,255,.08)',borderWidth:1,borderRadius:3}]},options:cB});
+new Chart(document.getElementById('c2'),{type:'doughnut',data:{labels:['LI','G','Org','Em','Web','Oth'],datasets:[{data:[28,19,16,22,11,4],backgroundColor:['rgba(255,255,255,.2)','rgba(255,255,255,.15)','rgba(255,255,255,.12)','rgba(255,255,255,.09)','rgba(255,255,255,.06)','rgba(255,255,255,.03)'],borderWidth:0}]},options:{...cB,cutout:'72%'}});
+new Chart(document.getElementById('c3'),{type:'line',data:{labels:['J','M','M','J','S','N'],datasets:[{data:[165,195,235,255,310,342],borderColor:'rgba(255,255,255,.2)',backgroundColor:'rgba(255,255,255,.02)',tension:.4,fill:true,pointRadius:2,pointBackgroundColor:'rgba(255,255,255,.3)'}]},options:cB});
+new Chart(document.getElementById('c4'),{type:'bar',data:{labels:['0-20','21-40','41-60','61-80','81+'],datasets:[{data:[1.2,5.2,12.4,22.7,34.2],backgroundColor:['rgba(255,255,255,.04)','rgba(255,255,255,.07)','rgba(255,255,255,.1)','rgba(255,255,255,.15)','rgba(255,255,255,.22)'],borderRadius:3}]},options:cB});
 
-/* ═══════════════════ RADIAL ORBITAL TIMELINE (21st.dev port) ═══════════════════ */
+/* ═══ ORBITAL TIMELINE ═══ */
 (function(){
   const data=[
-    {id:1,title:'Asst. Manager',icon:'&#128640;',date:'Jan 2025 — Present',status:'in-progress',energy:95,category:'RevOps · BI · Automation',content:'Architected end-to-end RevOps infrastructure spanning CRM, Marketo, ETL pipelines & Power BI for 12+ stakeholders.',relatedIds:[2,3],detail:{company:'NetCom Learning — New York (Remote)',tag:'neon',tagText:'REVOPS · BI ARCHITECTURE · AUTOMATION',bullets:['Architected end-to-end RevOps infrastructure spanning CRM, Marketo, ETL pipelines & Power BI executive dashboards for 12+ stakeholders','Engineered prospect scoring & lifecycle routing across MQL → SQL → Opportunity → Closed Won across 3 buyer segments','Eliminated manual reporting burden through Power BI automation consolidating 6 data sources <span class="detail-metric">−40 hrs/month</span>','Reduced campaign decision lag through dimensional ETL modelling <span class="detail-metric">5 days → <24 hrs</span>','Drove process optimisation via pipeline automation <span class="detail-metric">+30% efficiency</span>']}},
-    {id:2,title:'Team Lead',icon:'&#128200;',date:'Jul 2024 — Jan 2025',status:'completed',energy:82,category:'Campaign Analytics · Power BI',content:'Led campaign performance analysis across ROI, ROAS, CTR, CPL & conversion metrics across all channels.',relatedIds:[1,3],detail:{company:'NetCom Learning — New York (Remote)',tag:'hot',tagText:'CAMPAIGN ANALYTICS · POWER BI · OKRs',bullets:['Led campaign performance analysis across ROI, ROAS, CTR, CPL & conversion metrics across all channels','Identified 3 major funnel drop-off points; targeted interventions recovered qualified pipeline <span class="detail-metric">+18% pipeline</span>','Built Power BI dashboards tracking 15+ KPIs; established OKR reporting frameworks across 4 departments']}},
-    {id:3,title:'Mktg Analyst',icon:'&#128270;',date:'Aug 2023 — Jul 2024',status:'completed',energy:68,category:'Funnel Analytics · Reporting',content:'Audited full revenue operations funnel daily across 10+ paid & organic channels.',relatedIds:[2],detail:{company:'NetCom Learning — New York (Remote)',tag:'volt',tagText:'FUNNEL ANALYTICS · PERFORMANCE REPORTING',bullets:['Audited full revenue operations funnel daily across 10+ paid & organic channels','Established funnel hygiene frameworks that became the team-wide reporting baseline across 4 departments']}},
-    {id:4,title:'Attribution',icon:'&#127919;',date:'2024',status:'completed',energy:90,category:'Multi-Touch · Modelling',content:'Built 3 attribution models on $2.4M of closed revenue across 8 channels.',relatedIds:[1,5],detail:{company:'Project — Attribution Modelling',tag:'hot',tagText:'MULTI-TOUCH · SQL · POWER BI',bullets:['Built 3 complete attribution models (first-touch, last-touch, linear) on $2.4M revenue','Revealed LinkedIn under-credited by 18pp — reversed a planned $42K budget cut','Average buyer journey spans 6.3 touchpoints across 38 days']}},
-    {id:5,title:'ETL Engine',icon:'&#9889;',date:'2024',status:'completed',energy:88,category:'Automation · Pipeline',content:'End-to-end ETL pipeline replacing 40hrs/month of manual reporting. 50K+ rows daily.',relatedIds:[1,4],detail:{company:'Project — Campaign Automation',tag:'volt',tagText:'ETL PIPELINE · DIMENSIONAL · AUTOMATION',bullets:['Built end-to-end ETL replacing 40 hrs/month of manual reporting','Processes 50K+ rows daily with 99.8% uptime','Webinar campaigns generating 478% ROI were invisible in manual reporting']}},
-    {id:6,title:'Lead Score',icon:'&#128300;',date:'2025',status:'in-progress',energy:78,category:'Predictive · Cohort',content:'15-signal scoring model. Score 80+ leads convert at 34.2% — 4.7x the base rate.',relatedIds:[1,2],detail:{company:'Project — Predictive Analytics',tag:'neon',tagText:'SCORING MODEL · COHORT · MARKETO',bullets:['15-signal weighted scoring model identifies high-probability leads','Score 80+ leads convert at 34.2% — 4.7x the base rate','Enterprise retained 68% at Month 6 vs SMB 24% — 2.8x gap']}}
+    {id:1,title:'Asst. Manager',icon:'&#128640;',date:'Jan 2025 — Now',status:'in-progress',energy:95,content:'End-to-end RevOps for 12+ stakeholders.',relatedIds:[2,3],detail:{company:'NetCom Learning',tag:'REVOPS · BI · AUTOMATION',bullets:['Architected RevOps infrastructure: CRM, Marketo, ETL, Power BI for 12+ stakeholders','Prospect scoring & lifecycle routing: MQL → SQL → Opportunity → Closed Won','Power BI automation consolidating 6 sources <span class="o-metric">−40 hrs/mo</span>','ETL modelling reduced decision lag <span class="o-metric">5d → &lt;24h</span>','Pipeline automation <span class="o-metric">+30% efficiency</span>']}},
+    {id:2,title:'Team Lead',icon:'&#128200;',date:'Jul — Jan 2025',status:'completed',energy:82,content:'Campaign analytics across all channels.',relatedIds:[1,3],detail:{company:'NetCom Learning',tag:'ANALYTICS · POWER BI · OKRs',bullets:['Led campaign performance analysis: ROI, ROAS, CTR, CPL across all channels','Identified 3 funnel drop-off points; recovered pipeline <span class="o-metric">+18%</span>','Power BI dashboards tracking 15+ KPIs across 4 departments']}},
+    {id:3,title:'Analyst',icon:'&#128270;',date:'Aug 2023 — Jul 2024',status:'completed',energy:68,content:'Full funnel audit across 10+ channels.',relatedIds:[2],detail:{company:'NetCom Learning',tag:'FUNNEL ANALYTICS · REPORTING',bullets:['Full revenue funnel audit daily across 10+ paid & organic channels','Established funnel hygiene frameworks across 4 departments']}},
+    {id:4,title:'Attribution',icon:'&#127919;',date:'2024',status:'completed',energy:90,content:'3 models on $2.4M across 8 channels.',relatedIds:[1,5],detail:{company:'Project',tag:'MULTI-TOUCH · SQL · POWER BI',bullets:['3 attribution models on $2.4M revenue across 8 channels','LinkedIn under-credited by 18pp — reversed $42K budget cut','Average buyer: 6.3 touchpoints across 38 days']}},
+    {id:5,title:'ETL Engine',icon:'&#9889;',date:'2024',status:'completed',energy:88,content:'50K+ rows/day, 99.8% uptime.',relatedIds:[1,4],detail:{company:'Project',tag:'ETL · DIMENSIONAL · AUTOMATION',bullets:['ETL replacing 40 hrs/month of manual reporting','50K+ rows daily, 99.8% uptime','Webinar campaigns at 478% ROI were invisible before']}},
+    {id:6,title:'Lead Score',icon:'&#128300;',date:'2025',status:'in-progress',energy:78,content:'15-signal model, 34.2% top-tier conversion.',relatedIds:[1,2],detail:{company:'Project',tag:'SCORING · COHORT · MARKETO',bullets:['15-signal weighted scoring model','Score 80+ leads: 34.2% conversion — 4.7x base rate','Enterprise 68% retention at M6 vs SMB 24%']}}
   ];
-
-  const container=document.getElementById('orbitalContainer');
-  const detailContent=document.getElementById('detailContent');
-  const placeholder=document.getElementById('detailPlaceholder');
-  let activeId=null,autoRotate=true,angle=0,nodes={};
-
-  // Create nodes
+  const box=document.getElementById('orbitalBox'),oContent=document.getElementById('oContent'),oPH=document.getElementById('oPlaceholder');
+  let activeId=null,autoRot=true,angle=0,nodes={};
   data.forEach((item,i)=>{
-    const node=document.createElement('div');
-    node.className='orbital-node';
-    node.dataset.id=item.id;
-    node.innerHTML=`
-      <div class="node-glow" style="width:${item.energy*.5+40}px;height:${item.energy*.5+40}px;left:-${(item.energy*.5+40-42)/2}px;top:-${(item.energy*.5+40-42)/2}px"></div>
-      <div class="node-pulse"></div>
-      <div class="node-icon">${item.icon}</div>
-      <div class="node-label">${item.title}</div>
-      <div class="orbital-card">
-        <div class="ocard-header"><span class="ocard-badge ${item.status}">${item.status==='completed'?'COMPLETE':item.status==='in-progress'?'IN PROGRESS':'PENDING'}</span><span class="ocard-date">${item.date}</span></div>
-        <div class="ocard-title">${item.title}</div>
-        <div class="ocard-body">${item.content}</div>
-        <div class="ocard-energy"><div class="ocard-energy-header"><span>&#9889; Energy</span><span>${item.energy}%</span></div><div class="energy-bar"><div class="energy-fill" style="width:${item.energy}%"></div></div></div>
-        ${item.relatedIds.length?`<div class="ocard-connections"><div class="ocard-conn-label">Connected Nodes</div><div class="ocard-conn-list">${item.relatedIds.map(rid=>{const r=data.find(d=>d.id===rid);return `<button class="ocard-conn-btn" data-goto="${rid}">${r?r.title:'?'} &rarr;</button>`}).join('')}</div></div>`:''}
-      </div>
-    `;
-    node.addEventListener('click',(ev)=>{ev.stopPropagation();toggleNode(item.id)});
-    // Connection button clicks
-    node.querySelectorAll('.ocard-conn-btn').forEach(btn=>{
-      btn.addEventListener('click',(ev)=>{ev.stopPropagation();toggleNode(+btn.dataset.goto)});
-    });
-    container.appendChild(node);
-    nodes[item.id]=node;
+    const n=document.createElement('div');n.className='o-node';n.dataset.id=item.id;
+    n.innerHTML=`<div class="o-node-glow" style="width:${item.energy*.4+36}px;height:${item.energy*.4+36}px;left:-${(item.energy*.4+36-38)/2}px;top:-${(item.energy*.4+36-38)/2}px"></div><div class="o-node-pulse"></div><div class="o-node-icon">${item.icon}</div><div class="o-node-label">${item.title}</div><div class="o-card"><div class="oc-head"><span class="oc-badge ${item.status}">${item.status==='in-progress'?'ACTIVE':'DONE'}</span><span class="oc-date">${item.date}</span></div><div class="oc-title">${item.title}</div><div class="oc-body">${item.content}</div><div class="oc-bar-wrap"><div class="oc-bar-head"><span>Energy</span><span>${item.energy}%</span></div><div class="oc-bar"><div class="oc-bar-fill" style="width:${item.energy}%"></div></div></div>${item.relatedIds.length?`<div class="oc-conns"><div class="oc-conns-label">Connected</div>${item.relatedIds.map(rid=>{const r=data.find(d=>d.id===rid);return `<button class="oc-conn-btn" data-goto="${rid}">${r?r.title:'?'} &rarr;</button>`}).join('')}</div>`:''}</div>`;
+    n.addEventListener('click',ev=>{ev.stopPropagation();toggle(item.id)});
+    n.querySelectorAll('.oc-conn-btn').forEach(b=>b.addEventListener('click',ev=>{ev.stopPropagation();toggle(+b.dataset.goto)}));
+    box.appendChild(n);nodes[item.id]=n;
   });
-
-  // Position
-  function positionNodes(){
+  function position(){
     data.forEach((item,i)=>{
-      const a=((i/data.length)*360+angle)%360;
-      const r=Math.min(container.offsetWidth,container.offsetHeight)*.42;
-      const rad=a*Math.PI/180;
-      const x=r*Math.cos(rad);
-      const y=r*Math.sin(rad);
-      const opacity=Math.max(.35,Math.min(1,.35+.65*((1+Math.sin(rad))/2)));
-      const z=Math.round(100+50*Math.cos(rad));
-      const node=nodes[item.id];
-      node.style.left=`calc(50% + ${x}px - 21px)`;
-      node.style.top=`calc(50% + ${y}px - 21px)`;
-      if(!node.classList.contains('active')){node.style.opacity=opacity;node.style.zIndex=z}
+      const a=((i/data.length)*360+angle)%360,r=Math.min(box.offsetWidth,box.offsetHeight)*.42,rad=a*Math.PI/180;
+      const x=r*Math.cos(rad),y=r*Math.sin(rad);
+      const op=Math.max(.25,Math.min(1,.25+.75*((1+Math.sin(rad))/2)));
+      const z=Math.round(100+50*Math.cos(rad)),n=nodes[item.id];
+      n.style.left=`calc(50% + ${x}px - 19px)`;n.style.top=`calc(50% + ${y}px - 19px)`;
+      if(!n.classList.contains('active')){n.style.opacity=op;n.style.zIndex=z}
     });
   }
-
-  function toggleNode(id){
-    if(activeId===id){
-      nodes[id].classList.remove('active');
-      data.find(d=>d.id===id).relatedIds.forEach(rid=>nodes[rid]&&nodes[rid].classList.remove('related'));
-      activeId=null;autoRotate=true;
-      detailContent.style.display='none';placeholder.style.display='';
-    }else{
-      if(activeId){nodes[activeId].classList.remove('active');data.find(d=>d.id===activeId).relatedIds.forEach(rid=>nodes[rid]&&nodes[rid].classList.remove('related'))}
-      nodes[id].classList.add('active');
-      const item=data.find(d=>d.id===id);
-      item.relatedIds.forEach(rid=>nodes[rid]&&nodes[rid].classList.add('related'));
-      activeId=id;autoRotate=false;
-      // Center node
-      const idx=data.findIndex(d=>d.id===id);
-      angle=270-(idx/data.length)*360;
-      // Show detail
-      const d=item.detail;
-      detailContent.innerHTML=`
-        <div class="detail-role-tag ${d.tag}">${d.tagText}</div>
-        <div class="detail-company">${d.company}</div>
-        <div class="detail-period">${item.date}</div>
-        <ul class="detail-bullets">${d.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>
-      `;
-      detailContent.style.display='block';placeholder.style.display='none';
-    }
+  function toggle(id){
+    if(activeId===id){nodes[id].classList.remove('active');data.find(d=>d.id===id).relatedIds.forEach(rid=>nodes[rid]&&nodes[rid].classList.remove('related'));activeId=null;autoRot=true;oContent.style.display='none';oPH.style.display=''}
+    else{if(activeId){nodes[activeId].classList.remove('active');data.find(d=>d.id===activeId).relatedIds.forEach(rid=>nodes[rid]&&nodes[rid].classList.remove('related'))}
+    nodes[id].classList.add('active');const item=data.find(d=>d.id===id);item.relatedIds.forEach(rid=>nodes[rid]&&nodes[rid].classList.add('related'));activeId=id;autoRot=false;
+    const idx=data.findIndex(d=>d.id===id);angle=270-(idx/data.length)*360;
+    const d=item.detail;oContent.innerHTML=`<div class="o-tag">${d.tag}</div><div class="o-company">${d.company}</div><div class="o-period">${item.date}</div><ul class="o-bullets">${d.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>`;oContent.style.display='block';oPH.style.display='none'}
   }
-
-  // Click container to deselect
-  container.addEventListener('click',(ev)=>{
-    if(ev.target===container||ev.target.classList.contains('orbit-ring')){
-      if(activeId){toggleNode(activeId)}
-    }
-  });
-
-  // Auto-rotate
-  let raf;
-  function tick(){
-    if(autoRotate)angle=(angle+.25)%360;
-    positionNodes();
-    raf=requestAnimationFrame(tick);
-  }
-  tick();
+  box.addEventListener('click',ev=>{if(ev.target===box||ev.target.classList.contains('o-ring'))if(activeId)toggle(activeId)});
+  (function tick(){if(autoRot)angle=(angle+.2)%360;position();requestAnimationFrame(tick)})();
 })();
 
-/* ═══════════════════ PROJECT VIEWER ═══════════════════ */
-const projects=[
-  {file:'project1_revops_dashboard.html',title:'Full-Funnel RevOps Dashboard',sub:'PROJECT 01 · REVENUE OPERATIONS'},
-  {file:'project2_attribution_model.html',title:'Multi-Touch Attribution Framework',sub:'PROJECT 02 · MARKETING ANALYTICS'},
-  {file:'project3_campaign_engine.html',title:'Campaign Performance Engine',sub:'PROJECT 03 · ETL · AUTOMATION'},
-  {file:'project4_lead_scoring.html',title:'Lead Scoring & Cohort Analysis',sub:'PROJECT 04 · PREDICTIVE ANALYTICS'},
-];
-function openProject(i){
-  document.getElementById('viewerTitle').textContent=projects[i].title;
-  document.getElementById('viewerSub').textContent=projects[i].sub;
-  document.getElementById('viewerFrame').src=projects[i].file;
-  document.querySelectorAll('.viewer-tab').forEach((t,j)=>t.classList.toggle('active',j===i));
-  document.getElementById('projectViewer').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function switchProject(i){
-  document.getElementById('viewerTitle').textContent=projects[i].title;
-  document.getElementById('viewerSub').textContent=projects[i].sub;
-  document.getElementById('viewerFrame').src=projects[i].file;
-  document.querySelectorAll('.viewer-tab').forEach((t,j)=>t.classList.toggle('active',j===i));
-}
-function closeViewer(){document.getElementById('projectViewer').classList.remove('open');document.body.style.overflow='';document.getElementById('viewerFrame').src=''}
+/* ═══ PROJECT VIEWER ═══ */
+const PJ=[{file:'project1_revops_dashboard.html',title:'RevOps Dashboard',sub:'01 — REVENUE OPS'},{file:'project2_attribution_model.html',title:'Attribution Framework',sub:'02 — MARKETING'},{file:'project3_campaign_engine.html',title:'Campaign Engine',sub:'03 — ETL'},{file:'project4_lead_scoring.html',title:'Lead Scoring',sub:'04 — PREDICTIVE'}];
+function openProject(i){document.getElementById('vTitle').textContent=PJ[i].title;document.getElementById('vSub').textContent=PJ[i].sub;document.getElementById('vFrame').src=PJ[i].file;document.querySelectorAll('.viewer-tab').forEach((t,j)=>t.classList.toggle('active',j===i));document.getElementById('viewer').classList.add('open');document.body.style.overflow='hidden'}
+function switchProject(i){document.getElementById('vTitle').textContent=PJ[i].title;document.getElementById('vSub').textContent=PJ[i].sub;document.getElementById('vFrame').src=PJ[i].file;document.querySelectorAll('.viewer-tab').forEach((t,j)=>t.classList.toggle('active',j===i))}
+function closeViewer(){document.getElementById('viewer').classList.remove('open');document.body.style.overflow='';document.getElementById('vFrame').src=''}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer()});
 </script>
 </body>
