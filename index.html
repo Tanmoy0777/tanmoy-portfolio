@@ -4,287 +4,293 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tanmoy Acharjee | Revenue & Marketing Analytics Portfolio</title>
-<meta name="description" content="Revenue Operations & Marketing Analytics specialist — turning raw data into pipeline revenue. Portfolio of Tanmoy Acharjee.">
+<meta name="description" content="Revenue Operations & Marketing Analytics specialist — turning raw data into pipeline revenue.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
+/* ═══════════════════ DESIGN TOKENS ═══════════════════ */
 :root{
   --neon:#00F5D4;--hot:#F72585;--volt:#ADFF2F;--purple:#C77DFF;--blue:#4361EE;--orange:#FF6B35;
-  --dark:#060A12;--dark2:#0B1120;--dark3:#111827;--card:#121C2E;--card2:#182540;
+  --dark:#030712;--dark2:#0B1120;--dark3:#111827;--card:#0F172A;--card2:#1E293B;
   --text:#E2E8F0;--muted:#64748B;--white:#FFFFFF;
-  --radius:12px;
-  --transition:all .35s cubic-bezier(.4,0,.2,1);
+  --glass:rgba(15,23,42,.55);--glass-border:rgba(255,255,255,.06);
+  --radius:16px;--radius-sm:10px;--radius-xs:6px;
+  --transition:all .4s cubic-bezier(.16,1,.3,1);
+  --shadow-glow:0 0 80px -20px;
 }
+
+/* ═══════════════════ RESET ═══════════════════ */
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:80px}
-body{font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-::selection{background:rgba(0,245,212,.2);color:#fff}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--dark2)}::-webkit-scrollbar-thumb{background:linear-gradient(var(--neon),var(--hot));border-radius:10px}
+body{font-family:'Inter','DM Sans',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+::selection{background:rgba(0,245,212,.25);color:#fff}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:linear-gradient(var(--neon),var(--purple));border-radius:10px}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
 
 /* ═══════════════════ PRELOADER ═══════════════════ */
-#preloader{position:fixed;inset:0;z-index:10000;background:var(--dark);display:flex;align-items:center;justify-content:center;transition:opacity .6s,visibility .6s}
+#preloader{position:fixed;inset:0;z-index:10000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;transition:opacity .8s ease,visibility .8s}
 #preloader.done{opacity:0;visibility:hidden;pointer-events:none}
-.loader{display:flex;gap:6px}
-.loader span{width:8px;height:8px;border-radius:50%;animation:loaderBounce .6s infinite alternate}
-.loader span:nth-child(1){background:var(--neon);animation-delay:0s}
-.loader span:nth-child(2){background:var(--hot);animation-delay:.15s}
-.loader span:nth-child(3){background:var(--volt);animation-delay:.3s}
-@keyframes loaderBounce{to{transform:translateY(-16px);opacity:.3}}
+.loader-ring{width:48px;height:48px;border-radius:50%;border:2px solid transparent;border-top-color:var(--neon);border-right-color:var(--hot);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.25em;color:var(--muted);text-transform:uppercase}
+
+/* ═══════════════════ CANVAS TRAIL ═══════════════════ */
+#canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.35}
 
 /* ═══════════════════ NAV ═══════════════════ */
-nav{position:fixed;top:0;left:0;right:0;z-index:999;display:flex;align-items:center;justify-content:space-between;padding:0 3rem;height:64px;background:rgba(6,10,18,.85);backdrop-filter:blur(24px) saturate(1.8);border-bottom:1px solid rgba(0,245,212,.06);transition:var(--transition)}
-nav.scrolled{background:rgba(6,10,18,.96);box-shadow:0 4px 30px rgba(0,0,0,.4)}
-.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--white);letter-spacing:-.02em}
-.nav-logo span{background:linear-gradient(135deg,var(--neon),var(--hot));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.nav-links{display:flex;gap:.4rem}
-.nav-links a{color:var(--muted);font-size:.78rem;text-decoration:none;letter-spacing:.03em;font-family:'DM Sans',sans-serif;font-weight:500;padding:.45rem .9rem;border-radius:8px;transition:var(--transition)}
+nav{position:fixed;top:0;left:0;right:0;z-index:999;display:flex;align-items:center;justify-content:space-between;padding:0 2.5rem;height:60px;background:rgba(3,7,18,.6);backdrop-filter:blur(30px) saturate(1.6);border-bottom:1px solid var(--glass-border);transition:var(--transition)}
+nav.scrolled{background:rgba(3,7,18,.92);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--white);letter-spacing:-.03em}
+.nav-logo span{background:linear-gradient(135deg,var(--neon),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:.25rem}
+.nav-links a{color:var(--muted);font-size:.77rem;font-weight:500;padding:.45rem .85rem;border-radius:8px;transition:var(--transition);letter-spacing:.01em}
 .nav-links a:hover,.nav-links a.active{color:var(--white);background:rgba(255,255,255,.06)}
 .nav-right{display:flex;align-items:center;gap:1rem}
-.nav-cta{background:linear-gradient(135deg,var(--neon),#00C9A7);color:var(--dark);padding:.5rem 1.4rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.82rem;cursor:pointer;text-decoration:none;transition:var(--transition);border:none;letter-spacing:.01em}
-.nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,245,212,.35)}
+.nav-cta{background:var(--white);color:var(--dark);padding:.48rem 1.3rem;border-radius:8px;font-weight:600;font-size:.8rem;cursor:pointer;transition:var(--transition);border:none;letter-spacing:.01em}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,255,255,.15)}
 .mobile-toggle{display:none;background:none;border:none;cursor:pointer;padding:4px}
-.mobile-toggle span{display:block;width:22px;height:2px;background:var(--text);margin:5px 0;border-radius:2px;transition:var(--transition)}
+.mobile-toggle span{display:block;width:20px;height:1.5px;background:var(--text);margin:5px 0;border-radius:2px;transition:var(--transition)}
 
 /* ═══════════════════ HERO ═══════════════════ */
-#hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:7rem 3rem 5rem}
-.bg-grid{position:absolute;inset:0;background-image:
-  linear-gradient(rgba(0,245,212,.02) 1px,transparent 1px),
-  linear-gradient(90deg,rgba(0,245,212,.02) 1px,transparent 1px);
-  background-size:70px 70px;pointer-events:none}
-.bg-noise{position:absolute;inset:0;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");pointer-events:none}
-.glow-blob{position:absolute;border-radius:50%;filter:blur(150px);pointer-events:none;opacity:.08}
-.blob1{width:800px;height:800px;background:var(--neon);top:-350px;right:-250px}
-.blob2{width:600px;height:600px;background:var(--hot);bottom:-200px;left:-200px}
-.blob3{width:400px;height:400px;background:var(--purple);top:50%;left:50%;transform:translate(-50%,-50%)}
-.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:5rem;align-items:center;max-width:1280px;margin:0 auto;width:100%;position:relative;z-index:1}
-.hero-tag{display:inline-flex;align-items:center;gap:.6rem;background:rgba(0,245,212,.06);border:1px solid rgba(0,245,212,.15);color:var(--neon);padding:.4rem 1.1rem;border-radius:100px;font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.06em;margin-bottom:1.8rem}
-.hero-tag .dot{width:7px;height:7px;border-radius:50%;background:var(--neon);animation:blink 1.5s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
-h1.hero-name{font-family:'Syne',sans-serif;font-size:clamp(3.2rem,5.8vw,5.5rem);font-weight:800;line-height:.92;letter-spacing:-.05em;margin-bottom:1.2rem}
-.line1{color:var(--white)}
-.line2{color:transparent;-webkit-text-stroke:1.5px rgba(0,245,212,.6)}
-.line3{background:linear-gradient(135deg,var(--hot),var(--purple),var(--blue));background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradShift 4s ease infinite}
-@keyframes gradShift{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
-.hero-desc{color:var(--muted);font-size:1rem;line-height:1.8;max-width:500px;margin-bottom:2.5rem}
-.hero-desc strong{color:var(--text);font-weight:600}
-.hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
-.btn-primary{background:linear-gradient(135deg,var(--neon),#00C9A7);color:var(--dark);padding:.8rem 2rem;border:none;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;transition:var(--transition);box-shadow:0 4px 24px rgba(0,245,212,.2)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(0,245,212,.4)}
-.btn-outline{background:transparent;border:1px solid rgba(247,37,133,.4);color:var(--hot);padding:.8rem 2rem;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;transition:var(--transition)}
-.btn-outline:hover{background:rgba(247,37,133,.08);border-color:var(--hot);transform:translateY(-2px)}
-.hero-stats{display:flex;flex-direction:column;gap:1rem}
-.stat-card{background:rgba(18,28,46,.6);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius);padding:1.5rem 1.8rem;position:relative;overflow:hidden;transition:var(--transition);backdrop-filter:blur(10px)}
-.stat-card:hover{transform:translateX(-6px);border-color:rgba(255,255,255,.1)}
-.stat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 2px 2px 0}
-.stat-card:nth-child(1)::before{background:var(--neon)}.stat-card:nth-child(2)::before{background:var(--hot)}.stat-card:nth-child(3)::before{background:var(--volt)}
-.stat-num{font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;line-height:1}
-.stat-card:nth-child(1) .stat-num{color:var(--neon)}.stat-card:nth-child(2) .stat-num{color:var(--hot)}.stat-card:nth-child(3) .stat-num{color:var(--volt)}
-.stat-label{color:var(--muted);font-size:.72rem;margin-top:.3rem;font-family:'Space Mono',monospace;letter-spacing:.05em}
+#hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:8rem 3rem 5rem}
+.bg-grain{position:absolute;inset:0;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none;z-index:1}
+.glow-orb{position:absolute;border-radius:50%;filter:blur(120px);pointer-events:none;opacity:.06;z-index:0}
+.orb1{width:700px;height:700px;background:var(--neon);top:-300px;right:-200px}
+.orb2{width:500px;height:500px;background:var(--hot);bottom:-250px;left:-150px}
+.orb3{width:350px;height:350px;background:var(--purple);top:40%;left:45%}
+.hero-content{max-width:1280px;margin:0 auto;width:100%;position:relative;z-index:2;display:grid;grid-template-columns:1.2fr .8fr;gap:5rem;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:.55rem;background:rgba(0,245,212,.04);border:1px solid rgba(0,245,212,.1);color:var(--neon);padding:.35rem 1rem;border-radius:100px;font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.08em;margin-bottom:2rem}
+.hero-badge .pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--neon);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
+h1.hero-title{font-family:'Syne',sans-serif;font-size:clamp(3rem,5.5vw,5.2rem);font-weight:800;line-height:.9;letter-spacing:-.06em;margin-bottom:1.5rem}
+.hero-line1{color:var(--white);display:block}
+.hero-line2{color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.2);display:block}
+.hero-line3{display:block;background:linear-gradient(135deg,var(--neon),var(--purple),var(--hot));background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradFlow 5s ease infinite}
+@keyframes gradFlow{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+.hero-sub{color:var(--muted);font-size:.95rem;line-height:1.85;max-width:480px;margin-bottom:2.5rem;font-weight:400}
+.hero-sub strong{color:var(--text);font-weight:600}
+.hero-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.btn-primary{display:inline-flex;align-items:center;gap:.5rem;background:var(--white);color:var(--dark);padding:.75rem 1.8rem;border:none;font-weight:700;font-size:.88rem;cursor:pointer;border-radius:var(--radius-sm);transition:var(--transition);letter-spacing:-.01em}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(255,255,255,.2)}
+.btn-secondary{display:inline-flex;align-items:center;gap:.5rem;background:transparent;border:1px solid rgba(255,255,255,.12);color:var(--text);padding:.75rem 1.8rem;font-weight:600;font-size:.88rem;cursor:pointer;border-radius:var(--radius-sm);transition:var(--transition)}
+.btn-secondary:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.04);transform:translateY(-2px)}
+.hero-metrics{display:flex;flex-direction:column;gap:1rem}
+.metric-card{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:var(--radius);padding:1.8rem 2rem;position:relative;overflow:hidden;transition:var(--transition)}
+.metric-card:hover{transform:translateX(-8px);border-color:rgba(255,255,255,.1)}
+.metric-card::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2px}
+.metric-card:nth-child(1)::after{background:var(--neon)}.metric-card:nth-child(2)::after{background:var(--hot)}.metric-card:nth-child(3)::after{background:var(--volt)}
+.metric-value{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;line-height:1}
+.metric-card:nth-child(1) .metric-value{color:var(--neon)}.metric-card:nth-child(2) .metric-value{color:var(--hot)}.metric-card:nth-child(3) .metric-value{color:var(--volt)}
+.metric-label{color:var(--muted);font-size:.65rem;margin-top:.35rem;font-family:'Space Mono',monospace;letter-spacing:.06em;text-transform:uppercase}
 
-/* ═══════════════════ TICKER ═══════════════════ */
-.ticker-wrap{overflow:hidden;background:rgba(0,245,212,.03);border-top:1px solid rgba(0,245,212,.06);border-bottom:1px solid rgba(0,245,212,.06);padding:.65rem 0}
-.ticker{display:flex;gap:4rem;animation:ticker 30s linear infinite;white-space:nowrap}
-@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.ticker-item{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--neon);letter-spacing:.12em;opacity:.5}
+/* ═══════════════════ MARQUEE ═══════════════════ */
+.marquee-wrap{overflow:hidden;background:rgba(255,255,255,.015);border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);padding:.7rem 0}
+.marquee{display:flex;gap:3.5rem;animation:marquee 35s linear infinite;white-space:nowrap}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.marquee-item{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--neon);letter-spacing:.15em;opacity:.4}
 
-/* ═══════════════════ SECTION ═══════════════════ */
-section{padding:7rem 3rem;position:relative;z-index:1}
+/* ═══════════════════ SECTIONS ═══════════════════ */
+section{padding:7rem 3rem;position:relative;z-index:2}
 .section-inner{max-width:1280px;margin:0 auto}
-.section-label{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--neon);letter-spacing:.2em;text-transform:uppercase;margin-bottom:.5rem}
-.section-title{font-family:'Syne',sans-serif;font-size:clamp(2.2rem,3.8vw,3rem);font-weight:800;letter-spacing:-.04em;line-height:1.05;margin-bottom:1rem}
-.section-title span{color:transparent;-webkit-text-stroke:1px var(--hot)}
-.section-subtitle{color:var(--muted);font-size:.95rem;line-height:1.7;max-width:600px;margin-bottom:3.5rem}
+.section-eyebrow{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--neon);letter-spacing:.22em;text-transform:uppercase;margin-bottom:.5rem}
+.section-heading{font-family:'Syne',sans-serif;font-size:clamp(2rem,3.5vw,2.8rem);font-weight:800;letter-spacing:-.04em;line-height:1.05;margin-bottom:.75rem}
+.section-heading em{font-style:normal;color:transparent;-webkit-text-stroke:1px var(--muted)}
+.section-desc{color:var(--muted);font-size:.92rem;line-height:1.75;max-width:560px;margin-bottom:3.5rem}
 
 /* ═══════════════════ SKILLS ═══════════════════ */
 #skills{background:var(--dark2)}
-.skills-categories{display:flex;flex-direction:column;gap:2.5rem}
-.skill-category-label{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid rgba(255,255,255,.04)}
-.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.6rem}
-.skill-chip{background:rgba(18,28,46,.5);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:.75rem 1rem;display:flex;align-items:center;gap:.6rem;transition:var(--transition);cursor:default}
-.skill-chip:hover{border-color:rgba(0,245,212,.2);background:rgba(0,245,212,.04);transform:translateY(-2px)}
-.skill-chip .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.skill-chip span{font-size:.82rem;font-weight:500}
+.skills-groups{display:flex;flex-direction:column;gap:2.5rem}
+.skill-group-label{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.65rem;padding-bottom:.45rem;border-bottom:1px solid rgba(255,255,255,.03)}
+.skills-row{display:flex;flex-wrap:wrap;gap:.5rem}
+.skill-pill{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:100px;padding:.55rem 1rem;display:inline-flex;align-items:center;gap:.5rem;transition:var(--transition);cursor:default;font-size:.8rem;font-weight:500}
+.skill-pill:hover{border-color:rgba(0,245,212,.2);background:rgba(0,245,212,.04);transform:translateY(-2px)}
+.skill-pill .indicator{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 
-/* ═══════════════════ EXPERIENCE ═══════════════════ */
-.exp-timeline{display:flex;flex-direction:column}
-.exp-item{display:grid;grid-template-columns:200px 1fr;gap:2.5rem;padding:2.5rem 0;border-bottom:1px solid rgba(255,255,255,.04);transition:var(--transition)}
-.exp-item:hover{background:rgba(255,255,255,.01);margin:0 -1rem;padding-left:1rem;padding-right:1rem;border-radius:var(--radius)}
-.exp-date{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--neon);padding-top:.35rem}
-.exp-company{color:var(--muted);font-size:.74rem;margin-top:.25rem;line-height:1.4}
-.exp-content h3{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;color:var(--white);margin-bottom:.5rem}
-.exp-role-tag{display:inline-block;background:rgba(247,37,133,.08);border:1px solid rgba(247,37,133,.2);color:var(--hot);font-size:.64rem;font-family:'Space Mono',monospace;padding:.2rem .7rem;border-radius:6px;letter-spacing:.04em;margin-bottom:1rem}
-.exp-bullets{list-style:none;display:flex;flex-direction:column;gap:.55rem}
-.exp-bullets li{color:var(--muted);font-size:.87rem;line-height:1.7;padding-left:1.4rem;position:relative}
-.exp-bullets li::before{content:'';position:absolute;left:0;top:.6rem;width:5px;height:5px;border-radius:50%;background:var(--neon)}
-.metric-pill{display:inline-flex;align-items:center;background:rgba(173,255,47,.06);border:1px solid rgba(173,255,47,.15);color:var(--volt);font-size:.67rem;font-family:'Space Mono',monospace;padding:.15rem .55rem;border-radius:6px;margin-left:.4rem;font-weight:700}
+/* ═══════════════════ ORBITAL TIMELINE ═══════════════════ */
+#experience{background:var(--dark)}
+.orbital-section{display:grid;grid-template-columns:.65fr .35fr;gap:3rem;align-items:start}
+.orbital-container{position:relative;width:100%;aspect-ratio:1;max-width:620px;margin:0 auto;cursor:grab}
+.orbital-container:active{cursor:grabbing}
+.orbital-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue),var(--neon));display:flex;align-items:center;justify-content:center;z-index:10}
+.orbital-center::before{content:'';position:absolute;width:72px;height:72px;border-radius:50%;border:1px solid rgba(255,255,255,.12);animation:ping 2s cubic-bezier(0,0,.2,1) infinite}
+.orbital-center::after{content:'';position:absolute;width:88px;height:88px;border-radius:50%;border:1px solid rgba(255,255,255,.06);animation:ping 2s cubic-bezier(0,0,.2,1) infinite;animation-delay:.5s}
+@keyframes ping{75%,100%{transform:scale(1.8);opacity:0}}
+.orbital-core{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.85);backdrop-filter:blur(4px)}
+.orbit-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid rgba(255,255,255,.04);transform:translate(-50%,-50%)}
+.orbit-ring-1{width:55%;height:55%}.orbit-ring-2{width:80%;height:80%}.orbit-ring-3{width:100%;height:100%}
+.orbital-node{position:absolute;transition:transform .7s cubic-bezier(.16,1,.3,1),opacity .5s;cursor:pointer;z-index:5}
+.orbital-node.active{z-index:20}
+.node-glow{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.15) 0%,transparent 70%);pointer-events:none;transition:opacity .3s}
+.node-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;border:2px solid rgba(255,255,255,.25);background:rgba(15,23,42,.9);backdrop-filter:blur(8px);color:var(--white);transition:var(--transition);position:relative;z-index:1}
+.orbital-node:hover .node-icon{border-color:rgba(255,255,255,.5);transform:scale(1.1)}
+.orbital-node.active .node-icon{background:var(--white);color:var(--dark);border-color:var(--white);transform:scale(1.35);box-shadow:0 0 30px rgba(255,255,255,.3)}
+.node-label{position:absolute;top:52px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.6rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5);transition:var(--transition);font-family:'Space Mono',monospace}
+.orbital-node.active .node-label{color:var(--white);transform:translateX(-50%) scale(1.1)}
+.node-pulse{position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(255,255,255,.3);animation:nodePulse 1.5s ease infinite;opacity:0}
+.orbital-node.related .node-pulse{opacity:1}
+.orbital-node.related .node-icon{border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.15)}
+@keyframes nodePulse{0%{transform:scale(1);opacity:.6}100%{transform:scale(2);opacity:0}}
+
+/* Orbital Card */
+.orbital-card{position:absolute;top:85px;left:50%;transform:translateX(-50%);width:280px;background:rgba(15,23,42,.92);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:0;overflow:hidden;box-shadow:0 32px 64px rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s;z-index:30}
+.orbital-node.active .orbital-card{opacity:1;visibility:visible}
+.orbital-card::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:30px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent)}
+.ocard-header{padding:1rem 1.2rem .6rem;display:flex;justify-content:space-between;align-items:center}
+.ocard-badge{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.06em;padding:.2rem .6rem;border-radius:4px;font-weight:700}
+.ocard-badge.completed{background:rgba(0,245,212,.1);color:var(--neon);border:1px solid rgba(0,245,212,.2)}
+.ocard-badge.in-progress{background:rgba(255,255,255,.1);color:var(--white);border:1px solid rgba(255,255,255,.2)}
+.ocard-badge.pending{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid rgba(255,255,255,.06)}
+.ocard-date{font-family:'Space Mono',monospace;font-size:.55rem;color:var(--muted)}
+.ocard-title{padding:0 1.2rem;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--white);margin-bottom:.4rem}
+.ocard-body{padding:.4rem 1.2rem 1rem;font-size:.75rem;color:rgba(255,255,255,.6);line-height:1.65}
+.ocard-energy{padding:.6rem 1.2rem;border-top:1px solid rgba(255,255,255,.05)}
+.ocard-energy-header{display:flex;justify-content:space-between;align-items:center;font-size:.6rem;color:var(--muted);margin-bottom:.35rem}
+.ocard-energy-header span{font-family:'Space Mono',monospace}
+.energy-bar{width:100%;height:3px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+.energy-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:4px;transition:width .6s ease}
+.ocard-connections{padding:.6rem 1.2rem .8rem;border-top:1px solid rgba(255,255,255,.05)}
+.ocard-conn-label{font-size:.55rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem;font-family:'Space Mono',monospace}
+.ocard-conn-list{display:flex;flex-wrap:wrap;gap:.3rem}
+.ocard-conn-btn{background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65);padding:.2rem .55rem;font-size:.6rem;cursor:pointer;transition:var(--transition);font-family:inherit;border-radius:4px}
+.ocard-conn-btn:hover{background:rgba(255,255,255,.08);color:var(--white)}
+
+/* Orbital Detail Panel */
+.orbital-detail{position:sticky;top:100px}
+.detail-panel{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:var(--radius);padding:2rem;min-height:300px}
+.detail-placeholder{text-align:center;padding:4rem 0}
+.detail-placeholder-icon{font-size:2.5rem;margin-bottom:1rem;opacity:.3}
+.detail-placeholder-text{color:var(--muted);font-size:.85rem}
+.detail-active .detail-panel{border-color:rgba(255,255,255,.1)}
+.detail-role-tag{display:inline-block;font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.06em;padding:.25rem .7rem;border-radius:var(--radius-xs);margin-bottom:1.2rem}
+.detail-role-tag.neon{background:rgba(0,245,212,.06);color:var(--neon);border:1px solid rgba(0,245,212,.15)}
+.detail-role-tag.hot{background:rgba(247,37,133,.06);color:var(--hot);border:1px solid rgba(247,37,133,.15)}
+.detail-role-tag.volt{background:rgba(173,255,47,.06);color:var(--volt);border:1px solid rgba(173,255,47,.15)}
+.detail-company{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--white);margin-bottom:.15rem}
+.detail-period{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--neon);margin-bottom:1.2rem}
+.detail-bullets{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+.detail-bullets li{color:var(--muted);font-size:.84rem;line-height:1.7;padding-left:1.3rem;position:relative}
+.detail-bullets li::before{content:'';position:absolute;left:0;top:.6rem;width:4px;height:4px;border-radius:50%;background:var(--neon)}
+.detail-metric{display:inline-flex;background:rgba(173,255,47,.05);border:1px solid rgba(173,255,47,.12);color:var(--volt);font-size:.62rem;font-family:'Space Mono',monospace;padding:.12rem .5rem;border-radius:4px;margin-left:.3rem;font-weight:700}
 
 /* ═══════════════════ PROJECTS ═══════════════════ */
 #projects{background:var(--dark3)}
-.projects-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
-.proj-card{
-  background:var(--card);border:1px solid rgba(255,255,255,.04);
-  border-radius:16px;overflow:hidden;cursor:pointer;
-  transition:var(--transition);display:flex;flex-direction:column;
-  position:relative;
-}
-.proj-card:hover{transform:translateY(-8px);box-shadow:0 32px 64px rgba(0,0,0,.5)}
-.proj-card[data-accent="neon"]{border-top:3px solid var(--neon)}.proj-card[data-accent="neon"]:hover{border-color:var(--neon);box-shadow:0 32px 64px rgba(0,245,212,.12)}
-.proj-card[data-accent="hot"]{border-top:3px solid var(--hot)}.proj-card[data-accent="hot"]:hover{border-color:var(--hot);box-shadow:0 32px 64px rgba(247,37,133,.12)}
-.proj-card[data-accent="volt"]{border-top:3px solid var(--volt)}.proj-card[data-accent="volt"]:hover{border-color:var(--volt);box-shadow:0 32px 64px rgba(173,255,47,.12)}
-.proj-card[data-accent="purple"]{border-top:3px solid var(--purple)}.proj-card[data-accent="purple"]:hover{border-color:var(--purple);box-shadow:0 32px 64px rgba(199,125,255,.12)}
-.proj-card-inner{padding:2rem;flex:1;display:flex;flex-direction:column}
-.proj-num{font-family:'Space Mono',monospace;font-size:.63rem;letter-spacing:.12em;margin-bottom:.8rem}
-.proj-icon-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-.proj-icon-box{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
-.proj-status{font-family:'Space Mono',monospace;font-size:.6rem;padding:.25rem .7rem;border-radius:6px;letter-spacing:.04em}
-.proj-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:.65rem;line-height:1.25;color:var(--white)}
-.proj-desc{font-size:.85rem;color:var(--muted);line-height:1.7;margin-bottom:1.3rem;flex:1}
-.proj-mini-chart{background:rgba(11,17,32,.6);border-radius:10px;padding:1rem;margin-bottom:1.3rem;height:115px;position:relative}
-.proj-mini-chart canvas{max-height:95px}
-.proj-insight-preview{
-  background:rgba(0,245,212,.03);border:1px solid rgba(0,245,212,.08);
-  border-radius:10px;padding:.85rem;margin-bottom:1.3rem;
-  font-size:.8rem;color:var(--muted);line-height:1.6;
-}
-.proj-insight-preview strong{color:var(--text)}
-.proj-insight-label{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--neon);letter-spacing:.08em;margin-bottom:.25rem}
-.proj-metrics-strip{display:flex;gap:1.2rem;margin-bottom:1.3rem;flex-wrap:wrap}
-.proj-metric-item{display:flex;flex-direction:column}
-.proj-metric-item .val{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800}
-.proj-metric-item .lbl{font-size:.65rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:.1rem}
-.proj-tags-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:0}
-.proj-tag{font-family:'Space Mono',monospace;font-size:.6rem;padding:.2rem .55rem;border-radius:6px;letter-spacing:.03em}
+.projects-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.proj-card{background:var(--card);border:1px solid var(--glass-border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:var(--transition);display:flex;flex-direction:column;position:relative}
+.proj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;transition:var(--transition)}
+.proj-card[data-accent="neon"]::before{background:var(--neon)}.proj-card[data-accent="hot"]::before{background:var(--hot)}.proj-card[data-accent="volt"]::before{background:var(--volt)}.proj-card[data-accent="purple"]::before{background:var(--purple)}
+.proj-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.08)}
+.proj-card[data-accent="neon"]:hover{box-shadow:var(--shadow-glow) rgba(0,245,212,.1)}
+.proj-card[data-accent="hot"]:hover{box-shadow:var(--shadow-glow) rgba(247,37,133,.1)}
+.proj-card[data-accent="volt"]:hover{box-shadow:var(--shadow-glow) rgba(173,255,47,.1)}
+.proj-card[data-accent="purple"]:hover{box-shadow:var(--shadow-glow) rgba(199,125,255,.1)}
+.proj-inner{padding:1.8rem;flex:1;display:flex;flex-direction:column}
+.proj-num{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.12em;margin-bottom:.75rem}
+.proj-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
+.proj-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.proj-badge{font-family:'Space Mono',monospace;font-size:.55rem;padding:.22rem .65rem;border-radius:4px;letter-spacing:.04em}
+.proj-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:.55rem;line-height:1.2;color:var(--white)}
+.proj-summary{font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:1.2rem;flex:1}
+.proj-chart-wrap{background:rgba(3,7,18,.5);border-radius:var(--radius-sm);padding:.8rem;margin-bottom:1.2rem;height:105px}
+.proj-chart-wrap canvas{max-height:90px}
+.proj-insight{background:rgba(0,245,212,.02);border:1px solid rgba(0,245,212,.06);border-radius:var(--radius-sm);padding:.75rem;margin-bottom:1.2rem;font-size:.77rem;color:var(--muted);line-height:1.6}
+.proj-insight strong{color:var(--text)}
+.proj-insight-tag{font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:.06em;margin-bottom:.2rem;display:block}
+.proj-kpis{display:flex;gap:1.2rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.proj-kpi .num{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800}
+.proj-kpi .lbl{font-size:.6rem;color:var(--muted);font-family:'Space Mono',monospace;margin-top:.05rem}
+.proj-tech{display:flex;gap:.35rem;flex-wrap:wrap}
+.proj-tech-tag{font-family:'Space Mono',monospace;font-size:.55rem;padding:.18rem .5rem;border-radius:4px;letter-spacing:.03em}
+.proj-footer{padding:.9rem 1.8rem;border-top:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.01)}
+.proj-cta{display:inline-flex;align-items:center;gap:.45rem;font-weight:700;font-size:.8rem;padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;border:none;transition:var(--transition)}
+.proj-cta .arrow{transition:transform .25s}.proj-cta:hover .arrow{transform:translateX(4px)}
+.proj-cta.neon{background:rgba(0,245,212,.06);color:var(--neon);border:1px solid rgba(0,245,212,.15)}.proj-cta.neon:hover{background:var(--neon);color:var(--dark)}
+.proj-cta.hot{background:rgba(247,37,133,.06);color:var(--hot);border:1px solid rgba(247,37,133,.15)}.proj-cta.hot:hover{background:var(--hot);color:#fff}
+.proj-cta.volt{background:rgba(173,255,47,.06);color:var(--volt);border:1px solid rgba(173,255,47,.15)}.proj-cta.volt:hover{background:var(--volt);color:var(--dark)}
+.proj-cta.purple{background:rgba(199,125,255,.06);color:var(--purple);border:1px solid rgba(199,125,255,.15)}.proj-cta.purple:hover{background:var(--purple);color:#fff}
+.proj-complexity{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted)}
 
-/* Card footer */
-.proj-cta-footer{
-  padding:1.1rem 2rem;border-top:1px solid rgba(255,255,255,.04);
-  display:flex;align-items:center;justify-content:space-between;
-  background:rgba(255,255,255,.01);
-}
-.proj-open-btn{
-  display:inline-flex;align-items:center;gap:.5rem;
-  font-family:'DM Sans',sans-serif;font-weight:700;font-size:.84rem;
-  padding:.6rem 1.4rem;border-radius:8px;cursor:pointer;
-  text-decoration:none;border:none;transition:var(--transition);
-}
-.proj-open-btn.neon{background:rgba(0,245,212,.08);color:var(--neon);border:1px solid rgba(0,245,212,.2)}
-.proj-open-btn.neon:hover{background:var(--neon);color:var(--dark)}
-.proj-open-btn.hot{background:rgba(247,37,133,.08);color:var(--hot);border:1px solid rgba(247,37,133,.2)}
-.proj-open-btn.hot:hover{background:var(--hot);color:#fff}
-.proj-open-btn.volt{background:rgba(173,255,47,.08);color:var(--volt);border:1px solid rgba(173,255,47,.2)}
-.proj-open-btn.volt:hover{background:var(--volt);color:var(--dark)}
-.proj-open-btn.purple{background:rgba(199,125,255,.08);color:var(--purple);border:1px solid rgba(199,125,255,.2)}
-.proj-open-btn.purple:hover{background:var(--purple);color:#fff}
-.proj-arrow{font-size:1rem;transition:transform .25s}
-.proj-open-btn:hover .proj-arrow{transform:translateX(5px)}
-.proj-complexity{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--muted)}
-
-/* ═══════════════════ PROJECT VIEWER MODAL ═══════════════════ */
-.project-viewer{
-  position:fixed;inset:0;z-index:9999;
-  background:rgba(6,10,18,.92);
-  backdrop-filter:blur(20px);
-  opacity:0;visibility:hidden;
-  transition:opacity .4s,visibility .4s;
-  display:flex;flex-direction:column;
-}
+/* ═══════════════════ PROJECT VIEWER ═══════════════════ */
+.project-viewer{position:fixed;inset:0;z-index:9999;background:rgba(3,7,18,.94);backdrop-filter:blur(20px);opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s;display:flex;flex-direction:column}
 .project-viewer.open{opacity:1;visibility:visible}
-.viewer-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.75rem 1.5rem;
-  background:rgba(11,17,32,.95);
-  border-bottom:1px solid rgba(255,255,255,.06);
-  flex-shrink:0;
-  min-height:56px;
-}
-.viewer-project-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--white)}
-.viewer-project-subtitle{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.05em}
-.viewer-nav{display:flex;align-items:center;gap:.5rem}
-.viewer-nav-btn{
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
-  color:var(--text);padding:.4rem 1rem;border-radius:8px;
-  font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;
-  cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:.35rem;
-}
-.viewer-nav-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15)}
-.viewer-nav-btn.active{background:rgba(0,245,212,.1);border-color:rgba(0,245,212,.3);color:var(--neon)}
-.viewer-close{
-  background:rgba(247,37,133,.08);border:1px solid rgba(247,37,133,.2);
-  color:var(--hot);width:36px;height:36px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:var(--transition);font-size:1.1rem;
-}
+.viewer-bar{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1.5rem;background:rgba(11,17,32,.95);border-bottom:1px solid var(--glass-border);flex-shrink:0;min-height:52px}
+.viewer-info{display:flex;flex-direction:column}
+.viewer-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--white)}
+.viewer-sub{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:.05em}
+.viewer-tabs{display:flex;gap:.35rem}
+.viewer-tab{background:rgba(255,255,255,.04);border:1px solid var(--glass-border);color:var(--muted);padding:.35rem .85rem;border-radius:6px;font-size:.72rem;font-weight:500;cursor:pointer;transition:var(--transition)}
+.viewer-tab:hover{background:rgba(255,255,255,.08);color:var(--text)}
+.viewer-tab.active{background:rgba(0,245,212,.08);border-color:rgba(0,245,212,.2);color:var(--neon)}
+.viewer-close{background:rgba(247,37,133,.06);border:1px solid rgba(247,37,133,.15);color:var(--hot);width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);font-size:1rem}
 .viewer-close:hover{background:var(--hot);color:#fff}
-.viewer-body{flex:1;overflow:hidden;position:relative}
-.viewer-body iframe{width:100%;height:100%;border:none;background:var(--dark)}
+.viewer-frame-wrap{flex:1;overflow:hidden}
+.viewer-frame-wrap iframe{width:100%;height:100%;border:none;background:var(--dark)}
 
 /* ═══════════════════ CONTACT ═══════════════════ */
-#contact{background:var(--dark);border-top:1px solid rgba(255,255,255,.03)}
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
-.contact-text h2{font-family:'Syne',sans-serif;font-size:clamp(2rem,3.5vw,3rem);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-bottom:1rem}
-.contact-text p{color:var(--muted);font-size:.92rem;line-height:1.8;margin-bottom:2.5rem}
-.contact-links{display:flex;flex-direction:column;gap:.75rem}
-.contact-link{display:flex;align-items:center;gap:1rem;color:var(--text);text-decoration:none;padding:1rem 1.2rem;background:rgba(18,28,46,.5);border:1px solid rgba(255,255,255,.04);border-radius:var(--radius);transition:var(--transition)}
-.contact-link:hover{border-color:rgba(0,245,212,.2);color:var(--neon);transform:translateX(6px);background:rgba(0,245,212,.03)}
-.contact-link .icon-wrap{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;background:rgba(0,245,212,.06)}
-.contact-link .info{display:flex;flex-direction:column}
-.contact-link .label{font-size:.64rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.06em;text-transform:uppercase}
-.contact-link .val{font-size:.88rem;font-weight:500}
+#contact{background:var(--dark);border-top:1px solid var(--glass-border)}
+.contact-layout{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+.contact-cta h2{font-family:'Syne',sans-serif;font-size:clamp(2rem,3.2vw,2.8rem);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-bottom:.9rem}
+.contact-cta p{color:var(--muted);font-size:.9rem;line-height:1.8;margin-bottom:2.2rem}
+.contact-cards{display:flex;flex-direction:column;gap:.65rem}
+.contact-card{display:flex;align-items:center;gap:1rem;padding:1rem 1.15rem;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--glass-border);border-radius:var(--radius-sm);transition:var(--transition)}
+.contact-card:hover{border-color:rgba(0,245,212,.15);transform:translateX(6px);background:rgba(0,245,212,.02)}
+.contact-card-icon{width:38px;height:38px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1rem;background:rgba(0,245,212,.04);flex-shrink:0}
+.contact-card-info{display:flex;flex-direction:column}
+.contact-card-label{font-size:.58rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.06em;text-transform:uppercase}
+.contact-card-val{font-size:.85rem;font-weight:500}
 
 /* ═══════════════════ FOOTER ═══════════════════ */
-footer{padding:2.5rem 3rem;border-top:1px solid rgba(255,255,255,.03);display:flex;align-items:center;justify-content:space-between}
-footer p{color:var(--muted);font-size:.74rem;font-family:'Space Mono',monospace}
+footer{padding:2rem 3rem;border-top:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2}
+footer p{color:var(--muted);font-size:.68rem;font-family:'Space Mono',monospace}
 
 /* ═══════════════════ ANIMATIONS ═══════════════════ */
-.fade-in{opacity:0;transform:translateY(30px);transition:opacity .7s cubic-bezier(.4,0,.2,1),transform .7s cubic-bezier(.4,0,.2,1)}
-.fade-in.visible{opacity:1;transform:translateY(0)}
-.fade-in-delay-1{transition-delay:.1s}.fade-in-delay-2{transition-delay:.2s}.fade-in-delay-3{transition-delay:.3s}
-
-.cursor{display:inline-block;width:3px;height:.85em;background:var(--neon);margin-left:3px;animation:cur .7s infinite;vertical-align:middle}
-@keyframes cur{0%,100%{opacity:1}50%{opacity:0}}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}.reveal-d3{transition-delay:.3s}
+.cursor-blink{display:inline-block;width:2px;height:.8em;background:var(--neon);margin-left:2px;animation:curBlink .65s infinite;vertical-align:middle}
+@keyframes curBlink{0%,100%{opacity:1}50%{opacity:0}}
 
 /* ═══════════════════ BACK TO TOP ═══════════════════ */
-.back-to-top{
-  position:fixed;bottom:2rem;right:2rem;z-index:998;
-  width:44px;height:44px;border-radius:12px;
-  background:rgba(0,245,212,.1);border:1px solid rgba(0,245,212,.2);
-  color:var(--neon);font-size:1.2rem;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:var(--transition);
-  opacity:0;transform:translateY(10px);pointer-events:none;
-}
-.back-to-top.show{opacity:1;transform:translateY(0);pointer-events:all}
-.back-to-top:hover{background:var(--neon);color:var(--dark)}
+.btt{position:fixed;bottom:1.5rem;right:1.5rem;z-index:998;width:40px;height:40px;border-radius:var(--radius-sm);background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--glass-border);color:var(--neon);font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition);opacity:0;transform:translateY(10px);pointer-events:none}
+.btt.show{opacity:1;transform:translateY(0);pointer-events:all}
+.btt:hover{background:var(--neon);color:var(--dark);border-color:var(--neon)}
 
 /* ═══════════════════ RESPONSIVE ═══════════════════ */
 @media(max-width:1100px){
-  .hero-grid{grid-template-columns:1fr;gap:3rem}
-  .hero-stats{flex-direction:row;flex-wrap:wrap}
-  .stat-card{flex:1;min-width:200px}
+  .hero-content{grid-template-columns:1fr;gap:3rem}
+  .hero-metrics{flex-direction:row;flex-wrap:wrap}.metric-card{flex:1;min-width:180px}
+  .orbital-section{grid-template-columns:1fr;gap:2rem}
+  .orbital-container{max-width:500px}
   .projects-grid{grid-template-columns:1fr}
-  .contact-grid{grid-template-columns:1fr}
+  .contact-layout{grid-template-columns:1fr}
 }
 @media(max-width:768px){
-  nav{padding:0 1.5rem}
-  .nav-links{display:none;position:absolute;top:64px;left:0;right:0;background:rgba(6,10,18,.98);flex-direction:column;padding:1rem 1.5rem;gap:0;border-bottom:1px solid rgba(255,255,255,.06)}
+  nav{padding:0 1.2rem}
+  .nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:rgba(3,7,18,.98);flex-direction:column;padding:1rem;gap:0;border-bottom:1px solid var(--glass-border)}
   .nav-links.open{display:flex}
-  .nav-links a{padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.03)}
+  .nav-links a{padding:.7rem .5rem;border-bottom:1px solid rgba(255,255,255,.03)}
   .mobile-toggle{display:block}
-  section{padding:5rem 1.5rem}
-  .exp-item{grid-template-columns:1fr;gap:.5rem}
-  .exp-date{padding-top:0}
+  section{padding:4.5rem 1.2rem}
+  .orbital-container{max-width:360px}
+  .orbital-card{width:240px}
+  .viewer-bar{flex-wrap:wrap;gap:.5rem;padding:.6rem .8rem}
+  .viewer-tabs{flex-wrap:wrap}
   footer{flex-direction:column;gap:.5rem;text-align:center}
-  .viewer-header{flex-wrap:wrap;gap:.5rem;padding:.75rem}
-  .viewer-nav{flex-wrap:wrap}
 }
 </style>
 </head>
 <body>
 
 <!-- PRELOADER -->
-<div id="preloader"><div class="loader"><span></span><span></span><span></span></div></div>
+<div id="preloader">
+  <div class="loader-ring"></div>
+  <div class="loader-text">Loading Portfolio</div>
+</div>
+
+<!-- CANVAS TRAIL EFFECT (21st.dev) -->
+<canvas id="canvas"></canvas>
 
 <!-- NAV -->
 <nav>
@@ -298,147 +304,116 @@ footer p{color:var(--muted);font-size:.74rem;font-family:'Space Mono',monospace}
   </div>
   <div class="nav-right">
     <a href="mailto:tanmoyacharjee661@gmail.com" class="nav-cta">Let's Talk</a>
-    <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
 
-<!-- HERO -->
+<!-- ═══════════════════ HERO ═══════════════════ -->
 <section id="hero">
-  <div class="bg-grid"></div>
-  <div class="bg-noise"></div>
-  <div class="glow-blob blob1"></div>
-  <div class="glow-blob blob2"></div>
-  <div class="glow-blob blob3"></div>
-  <div class="hero-grid">
+  <div class="bg-grain"></div>
+  <div class="glow-orb orb1"></div>
+  <div class="glow-orb orb2"></div>
+  <div class="glow-orb orb3"></div>
+  <div class="hero-content">
     <div>
-      <div class="hero-tag"><span class="dot"></span>Open to Opportunities &middot; Relocatable</div>
-      <h1 class="hero-name">
-        <div class="line1">TANMOY</div>
-        <div class="line2">ACHARJEE</div>
-        <div class="line3" id="typed-role"></div>
+      <div class="hero-badge"><span class="pulse-dot"></span> Open to Opportunities &middot; Relocatable</div>
+      <h1 class="hero-title">
+        <span class="hero-line1">TANMOY</span>
+        <span class="hero-line2">ACHARJEE</span>
+        <span class="hero-line3" id="typedRole"></span>
       </h1>
-      <p class="hero-desc"><strong>Revenue Operations &amp; Marketing Analytics</strong> specialist — turning raw data into pipeline revenue. 2.5+ years building full-funnel BI infrastructure, attribution models, and campaign automation for B2B SaaS companies serving the US market.</p>
-      <div class="hero-btns">
-        <a href="#projects" class="btn-primary">View Projects <span>&#8595;</span></a>
-        <a href="#contact" class="btn-outline">Get in Touch</a>
+      <p class="hero-sub"><strong>Revenue Operations &amp; Marketing Analytics</strong> specialist — turning raw data into pipeline revenue. 2.5+ years building full-funnel BI infrastructure, attribution models, and campaign automation for B2B SaaS companies.</p>
+      <div class="hero-actions">
+        <a href="#projects" class="btn-primary">View Projects &#8595;</a>
+        <a href="#contact" class="btn-secondary">Get in Touch</a>
       </div>
     </div>
-    <div class="hero-stats">
-      <div class="stat-card fade-in">
-        <div class="stat-num" data-target="40">0</div>
-        <div class="stat-label">HRS / MONTH REPORTING AUTOMATED</div>
-      </div>
-      <div class="stat-card fade-in fade-in-delay-1">
-        <div class="stat-num" data-target="18">0<span>%</span></div>
-        <div class="stat-label">QUALIFIED PIPELINE RECOVERED</div>
-      </div>
-      <div class="stat-card fade-in fade-in-delay-2">
-        <div class="stat-num" data-target="30">0<span>%</span></div>
-        <div class="stat-label">PROCESS OPTIMISATION GAIN</div>
-      </div>
+    <div class="hero-metrics">
+      <div class="metric-card reveal"><div class="metric-value" data-target="40">0</div><div class="metric-label">HRS / MONTH REPORTING AUTOMATED</div></div>
+      <div class="metric-card reveal reveal-d1"><div class="metric-value" data-target="18">0<span>%</span></div><div class="metric-label">QUALIFIED PIPELINE RECOVERED</div></div>
+      <div class="metric-card reveal reveal-d2"><div class="metric-value" data-target="30">0<span>%</span></div><div class="metric-label">PROCESS OPTIMISATION GAIN</div></div>
     </div>
   </div>
 </section>
 
-<!-- TICKER -->
-<div class="ticker-wrap"><div class="ticker">
-  <span class="ticker-item">POWER BI</span><span class="ticker-item">ADOBE MARKETO</span><span class="ticker-item">MS DYNAMICS 365</span><span class="ticker-item">ETL PIPELINES</span><span class="ticker-item">MULTI-TOUCH ATTRIBUTION</span><span class="ticker-item">ABM STRATEGY</span><span class="ticker-item">SQL</span><span class="ticker-item">GOOGLE ANALYTICS 4</span><span class="ticker-item">REVENUE OPERATIONS</span><span class="ticker-item">FUNNEL OPTIMISATION</span><span class="ticker-item">COHORT ANALYSIS</span><span class="ticker-item">DIMENSIONAL MODELLING</span>
-  <span class="ticker-item">POWER BI</span><span class="ticker-item">ADOBE MARKETO</span><span class="ticker-item">MS DYNAMICS 365</span><span class="ticker-item">ETL PIPELINES</span><span class="ticker-item">MULTI-TOUCH ATTRIBUTION</span><span class="ticker-item">ABM STRATEGY</span><span class="ticker-item">SQL</span><span class="ticker-item">GOOGLE ANALYTICS 4</span><span class="ticker-item">REVENUE OPERATIONS</span><span class="ticker-item">FUNNEL OPTIMISATION</span><span class="ticker-item">COHORT ANALYSIS</span><span class="ticker-item">DIMENSIONAL MODELLING</span>
+<!-- MARQUEE -->
+<div class="marquee-wrap"><div class="marquee">
+  <span class="marquee-item">POWER BI</span><span class="marquee-item">ADOBE MARKETO</span><span class="marquee-item">MS DYNAMICS 365</span><span class="marquee-item">ETL PIPELINES</span><span class="marquee-item">MULTI-TOUCH ATTRIBUTION</span><span class="marquee-item">ABM STRATEGY</span><span class="marquee-item">SQL</span><span class="marquee-item">GOOGLE ANALYTICS 4</span><span class="marquee-item">REVENUE OPS</span><span class="marquee-item">FUNNEL OPTIMISATION</span><span class="marquee-item">COHORT ANALYSIS</span><span class="marquee-item">DIMENSIONAL MODELLING</span>
+  <span class="marquee-item">POWER BI</span><span class="marquee-item">ADOBE MARKETO</span><span class="marquee-item">MS DYNAMICS 365</span><span class="marquee-item">ETL PIPELINES</span><span class="marquee-item">MULTI-TOUCH ATTRIBUTION</span><span class="marquee-item">ABM STRATEGY</span><span class="marquee-item">SQL</span><span class="marquee-item">GOOGLE ANALYTICS 4</span><span class="marquee-item">REVENUE OPS</span><span class="marquee-item">FUNNEL OPTIMISATION</span><span class="marquee-item">COHORT ANALYSIS</span><span class="marquee-item">DIMENSIONAL MODELLING</span>
 </div></div>
 
-<!-- SKILLS -->
+<!-- ═══════════════════ SKILLS ═══════════════════ -->
 <section id="skills">
   <div class="section-inner">
-    <div class="section-label">Core Toolkit</div>
-    <h2 class="section-title">Skills &amp; <span>Technologies</span></h2>
-    <div class="section-subtitle">Comprehensive skill set spanning analytics, automation, and strategic marketing operations.</div>
-    <div class="skills-categories">
-      <div class="fade-in">
-        <div class="skill-category-label">BI &amp; Analytics</div>
-        <div class="skills-grid">
-          <div class="skill-chip"><div class="dot" style="background:var(--neon)"></div><span>Power BI &middot; DAX</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--neon)"></div><span>Google Analytics 4</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--neon)"></div><span>Pipeline Forecasting</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--neon)"></div><span>Cohort Analysis</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--neon)"></div><span>A/B Testing</span></div>
+    <div class="section-eyebrow">Core Toolkit</div>
+    <h2 class="section-heading">Skills &amp; <em>Technologies</em></h2>
+    <div class="section-desc">Comprehensive skill set spanning analytics, automation, and strategic marketing operations.</div>
+    <div class="skills-groups">
+      <div class="reveal">
+        <div class="skill-group-label">BI &amp; Analytics</div>
+        <div class="skills-row">
+          <div class="skill-pill"><div class="indicator" style="background:var(--neon)"></div>Power BI &middot; DAX</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--neon)"></div>Google Analytics 4</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--neon)"></div>Pipeline Forecasting</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--neon)"></div>Cohort Analysis</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--neon)"></div>A/B Testing</div>
         </div>
       </div>
-      <div class="fade-in fade-in-delay-1">
-        <div class="skill-category-label">Marketing Ops &amp; CRM</div>
-        <div class="skills-grid">
-          <div class="skill-chip"><div class="dot" style="background:var(--hot)"></div><span>Adobe Marketo</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--hot)"></div><span>MS Dynamics 365</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--hot)"></div><span>ActiveCampaign</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--hot)"></div><span>Multi-Touch Attribution</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--hot)"></div><span>ABM Strategy</span></div>
+      <div class="reveal reveal-d1">
+        <div class="skill-group-label">Marketing Ops &amp; CRM</div>
+        <div class="skills-row">
+          <div class="skill-pill"><div class="indicator" style="background:var(--hot)"></div>Adobe Marketo</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--hot)"></div>MS Dynamics 365</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--hot)"></div>ActiveCampaign</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--hot)"></div>Multi-Touch Attribution</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--hot)"></div>ABM Strategy</div>
         </div>
       </div>
-      <div class="fade-in fade-in-delay-2">
-        <div class="skill-category-label">Data Engineering &amp; Strategy</div>
-        <div class="skills-grid">
-          <div class="skill-chip"><div class="dot" style="background:var(--volt)"></div><span>SQL</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--volt)"></div><span>ETL Pipeline Design</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--volt)"></div><span>Dimensional Modelling</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--volt)"></div><span>Advanced Excel / VBA</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--volt)"></div><span>OKR / KPI Frameworks</span></div>
+      <div class="reveal reveal-d2">
+        <div class="skill-group-label">Data Engineering &amp; Strategy</div>
+        <div class="skills-row">
+          <div class="skill-pill"><div class="indicator" style="background:var(--volt)"></div>SQL</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--volt)"></div>ETL Pipeline Design</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--volt)"></div>Dimensional Modelling</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--volt)"></div>Advanced Excel / VBA</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--volt)"></div>OKR / KPI Frameworks</div>
         </div>
       </div>
-      <div class="fade-in fade-in-delay-3">
-        <div class="skill-category-label">Channels &amp; Growth</div>
-        <div class="skills-grid">
-          <div class="skill-chip"><div class="dot" style="background:var(--purple)"></div><span>LinkedIn Ads</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--purple)"></div><span>Google PPC</span></div>
-          <div class="skill-chip"><div class="dot" style="background:var(--purple)"></div><span>SEO / Content Ops</span></div>
+      <div class="reveal reveal-d3">
+        <div class="skill-group-label">Channels &amp; Growth</div>
+        <div class="skills-row">
+          <div class="skill-pill"><div class="indicator" style="background:var(--purple)"></div>LinkedIn Ads</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--purple)"></div>Google PPC</div>
+          <div class="skill-pill"><div class="indicator" style="background:var(--purple)"></div>SEO / Content Ops</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- EXPERIENCE -->
-<section id="experience" style="background:var(--dark)">
+<!-- ═══════════════════ EXPERIENCE — ORBITAL TIMELINE (21st.dev) ═══════════════════ -->
+<section id="experience">
   <div class="section-inner">
-    <div class="section-label">Work History</div>
-    <h2 class="section-title">Experience <span>Timeline</span></h2>
-    <div class="section-subtitle">Progressive growth from analyst to assistant manager, building revenue infrastructure from the ground up.</div>
-    <div class="exp-timeline">
-      <div class="exp-item fade-in">
-        <div><div class="exp-date">Jan 2025 — Present</div><div class="exp-company">NetCom Learning<br>New York, US (Remote)</div></div>
-        <div class="exp-content">
-          <h3>Assistant Manager — Marketing &amp; Revenue Operations</h3>
-          <div class="exp-role-tag">REVOPS &middot; BI ARCHITECTURE &middot; AUTOMATION</div>
-          <ul class="exp-bullets">
-            <li>Architected end-to-end RevOps infrastructure spanning CRM, Marketo, ETL pipelines &amp; Power BI executive dashboards for 12+ stakeholders <span class="metric-pill">12+ stakeholders</span></li>
-            <li>Engineered prospect scoring &amp; lifecycle routing across MQL &rarr; SQL &rarr; Opportunity &rarr; Closed Won across 3 buyer segments</li>
-            <li>Eliminated manual reporting burden through Power BI automation consolidating 6 data sources <span class="metric-pill">&minus;40 hrs/month</span></li>
-            <li>Reduced campaign decision lag through dimensional ETL modelling <span class="metric-pill">5 days &rarr; &lt;24 hrs</span></li>
-            <li>Drove process optimisation via pipeline automation <span class="metric-pill">+30% efficiency</span></li>
-          </ul>
-        </div>
+    <div class="section-eyebrow">Career Journey</div>
+    <h2 class="section-heading">Experience <em>Timeline</em></h2>
+    <div class="section-desc">Click any orbital node to explore the role. Connected nodes pulse to show career progression.</div>
+    <div class="orbital-section">
+      <div class="orbital-container" id="orbitalContainer">
+        <!-- Orbit Rings -->
+        <div class="orbit-ring orbit-ring-1"></div>
+        <div class="orbit-ring orbit-ring-2"></div>
+        <div class="orbit-ring orbit-ring-3"></div>
+        <!-- Center -->
+        <div class="orbital-center"><div class="orbital-core"></div></div>
+        <!-- Nodes injected by JS -->
       </div>
-      <div class="exp-item fade-in">
-        <div><div class="exp-date">Jul 2024 — Jan 2025</div><div class="exp-company">NetCom Learning<br>New York, US (Remote)</div></div>
-        <div class="exp-content">
-          <h3>Team Lead — Revenue &amp; Campaign Analytics</h3>
-          <div class="exp-role-tag">CAMPAIGN ANALYTICS &middot; POWER BI &middot; OKRs</div>
-          <ul class="exp-bullets">
-            <li>Led campaign performance analysis across ROI, ROAS, CTR, CPL &amp; conversion metrics across all channels</li>
-            <li>Identified 3 major funnel drop-off points; targeted interventions recovered qualified pipeline <span class="metric-pill">+18% pipeline</span></li>
-            <li>Built Power BI dashboards tracking 15+ KPIs; established OKR reporting frameworks across 4 departments</li>
-          </ul>
-        </div>
-      </div>
-      <div class="exp-item fade-in">
-        <div><div class="exp-date">Aug 2023 — Jul 2024</div><div class="exp-company">NetCom Learning<br>New York, US (Remote)</div></div>
-        <div class="exp-content">
-          <h3>Marketing Analyst</h3>
-          <div class="exp-role-tag">FUNNEL ANALYTICS &middot; PERFORMANCE REPORTING</div>
-          <ul class="exp-bullets">
-            <li>Audited full revenue operations funnel daily across 10+ paid &amp; organic channels</li>
-            <li>Established funnel hygiene frameworks that became the team-wide reporting baseline across 4 departments</li>
-          </ul>
+      <div class="orbital-detail" id="orbitalDetail">
+        <div class="detail-panel">
+          <div class="detail-placeholder" id="detailPlaceholder">
+            <div class="detail-placeholder-icon">&#128260;</div>
+            <div class="detail-placeholder-text">Click an orbital node to explore role details, achievements, and career connections.</div>
+          </div>
+          <div id="detailContent" style="display:none"></div>
         </div>
       </div>
     </div>
@@ -448,142 +423,125 @@ footer p{color:var(--muted);font-size:.74rem;font-family:'Space Mono',monospace}
 <!-- ═══════════════════ PROJECTS ═══════════════════ -->
 <section id="projects">
   <div class="section-inner">
-    <div class="section-label">Real Work &middot; Real Data &middot; Real Impact</div>
-    <h2 class="section-title">Analytics <span>Projects</span></h2>
-    <div class="section-subtitle">Four standalone interactive dashboards built from actual work. Click any project to explore the full dashboard right here.</div>
-
+    <div class="section-eyebrow">Real Work &middot; Real Data &middot; Real Impact</div>
+    <h2 class="section-heading">Analytics <em>Projects</em></h2>
+    <div class="section-desc">Four standalone interactive dashboards. Click any project to explore the full dashboard right here.</div>
     <div class="projects-grid">
 
-      <!-- PROJECT 1 -->
-      <div class="proj-card fade-in" data-accent="neon" onclick="openProject(0)">
-        <div class="proj-card-inner">
+      <!-- P1 -->
+      <div class="proj-card reveal" data-accent="neon" onclick="openProject(0)">
+        <div class="proj-inner">
           <div class="proj-num" style="color:var(--neon)">PROJECT 01 &middot; REVENUE OPERATIONS</div>
-          <div class="proj-icon-row">
-            <div class="proj-icon-box" style="background:rgba(0,245,212,.08)">&#128202;</div>
-            <span class="proj-status" style="background:rgba(34,197,94,.08);color:#22C55E;border:1px solid rgba(34,197,94,.2)">LIVE DASHBOARD</span>
+          <div class="proj-head">
+            <div class="proj-icon" style="background:rgba(0,245,212,.06)">&#128202;</div>
+            <span class="proj-badge" style="background:rgba(34,197,94,.06);color:#22C55E;border:1px solid rgba(34,197,94,.15)">LIVE</span>
           </div>
-          <div class="proj-title">Full-Funnel Revenue Operations Dashboard</div>
-          <div class="proj-desc">Consolidates 6 data sources into a unified executive pipeline analytics layer. Tracks MQL &rarr; SQL &rarr; Opportunity &rarr; Closed Won. Eliminated 40 hours/month of manual reporting.</div>
-          <div class="proj-mini-chart"><canvas id="c1"></canvas></div>
-          <div class="proj-insight-preview">
-            <div class="proj-insight-label">TOP FINDING</div>
-            <strong>Organic search</strong> generates 34% of MQLs but drives 41% of revenue — highest ROI channel at $1,380 revenue/lead.
+          <div class="proj-name">Full-Funnel RevOps Dashboard</div>
+          <div class="proj-summary">Consolidates 6 data sources into a unified executive pipeline analytics layer. Tracks MQL &rarr; SQL &rarr; Opportunity &rarr; Closed Won.</div>
+          <div class="proj-chart-wrap"><canvas id="c1"></canvas></div>
+          <div class="proj-insight"><span class="proj-insight-tag" style="color:var(--neon)">TOP FINDING</span><strong>Organic search</strong> generates 34% of MQLs but drives 41% of revenue — highest ROI channel at $1,380/lead.</div>
+          <div class="proj-kpis">
+            <div class="proj-kpi"><div class="num" style="color:var(--neon)">$4.2M</div><div class="lbl">PIPELINE</div></div>
+            <div class="proj-kpi"><div class="num" style="color:var(--hot)">3,842</div><div class="lbl">MQLs</div></div>
+            <div class="proj-kpi"><div class="num" style="color:var(--volt)">6</div><div class="lbl">SOURCES</div></div>
           </div>
-          <div class="proj-metrics-strip">
-            <div class="proj-metric-item"><span class="val" style="color:var(--neon)">$4.2M</span><span class="lbl">PIPELINE TRACKED</span></div>
-            <div class="proj-metric-item"><span class="val" style="color:var(--hot)">3,842</span><span class="lbl">MQLs ANALYSED</span></div>
-            <div class="proj-metric-item"><span class="val" style="color:var(--volt)">6 sources</span><span class="lbl">CONSOLIDATED</span></div>
-          </div>
-          <div class="proj-tags-row">
-            <span class="proj-tag" style="background:rgba(0,245,212,.08);color:var(--neon)">Power BI</span>
-            <span class="proj-tag" style="background:rgba(247,37,133,.08);color:var(--hot)">Marketo</span>
-            <span class="proj-tag" style="background:rgba(173,255,47,.08);color:var(--volt)">ETL</span>
-            <span class="proj-tag" style="background:rgba(199,125,255,.08);color:var(--purple)">MS Dynamics</span>
-            <span class="proj-tag" style="background:rgba(67,97,238,.08);color:var(--blue)">GA4</span>
+          <div class="proj-tech">
+            <span class="proj-tech-tag" style="background:rgba(0,245,212,.06);color:var(--neon)">Power BI</span>
+            <span class="proj-tech-tag" style="background:rgba(247,37,133,.06);color:var(--hot)">Marketo</span>
+            <span class="proj-tech-tag" style="background:rgba(173,255,47,.06);color:var(--volt)">ETL</span>
+            <span class="proj-tech-tag" style="background:rgba(199,125,255,.06);color:var(--purple)">Dynamics</span>
           </div>
         </div>
-        <div class="proj-cta-footer">
-          <button class="proj-open-btn neon" onclick="event.stopPropagation();openProject(0)">Explore Dashboard <span class="proj-arrow">&rarr;</span></button>
-          <span class="proj-complexity">6 charts &middot; 6 KPIs &middot; insights</span>
+        <div class="proj-footer">
+          <button class="proj-cta neon" onclick="event.stopPropagation();openProject(0)">Explore <span class="arrow">&rarr;</span></button>
+          <span class="proj-complexity">6 charts &middot; 6 KPIs</span>
         </div>
       </div>
 
-      <!-- PROJECT 2 -->
-      <div class="proj-card fade-in" data-accent="hot" onclick="openProject(1)">
-        <div class="proj-card-inner">
+      <!-- P2 -->
+      <div class="proj-card reveal" data-accent="hot" onclick="openProject(1)">
+        <div class="proj-inner">
           <div class="proj-num" style="color:var(--hot)">PROJECT 02 &middot; MARKETING ANALYTICS</div>
-          <div class="proj-icon-row">
-            <div class="proj-icon-box" style="background:rgba(247,37,133,.08)">&#127919;</div>
-            <span class="proj-status" style="background:rgba(247,37,133,.08);color:var(--hot);border:1px solid rgba(247,37,133,.2)">3 MODELS</span>
+          <div class="proj-head">
+            <div class="proj-icon" style="background:rgba(247,37,133,.06)">&#127919;</div>
+            <span class="proj-badge" style="background:rgba(247,37,133,.06);color:var(--hot);border:1px solid rgba(247,37,133,.15)">3 MODELS</span>
           </div>
-          <div class="proj-title">Multi-Touch Attribution Modelling Framework</div>
-          <div class="proj-desc">Built 3 complete attribution models on $2.4M of closed revenue across 8 channels. Revealed LinkedIn was under-credited by 18pp — reversed a planned $42K budget cut.</div>
-          <div class="proj-mini-chart"><canvas id="c2"></canvas></div>
-          <div class="proj-insight-preview" style="background:rgba(247,37,133,.03);border-color:rgba(247,37,133,.1)">
-            <div class="proj-insight-label" style="color:var(--hot)">TOP FINDING</div>
-            Last-touch attribution systematically <strong>under-credits awareness channels by 40-60%</strong>, leading to misallocated spend.
+          <div class="proj-name">Multi-Touch Attribution Framework</div>
+          <div class="proj-summary">3 attribution models on $2.4M of closed revenue across 8 channels. Revealed LinkedIn was under-credited by 18pp.</div>
+          <div class="proj-chart-wrap"><canvas id="c2"></canvas></div>
+          <div class="proj-insight" style="background:rgba(247,37,133,.02);border-color:rgba(247,37,133,.06)"><span class="proj-insight-tag" style="color:var(--hot)">TOP FINDING</span>Last-touch attribution <strong>under-credits awareness channels by 40-60%</strong>, leading to misallocated spend.</div>
+          <div class="proj-kpis">
+            <div class="proj-kpi"><div class="num" style="color:var(--hot)">$2.4M</div><div class="lbl">ATTRIBUTED</div></div>
+            <div class="proj-kpi"><div class="num" style="color:var(--neon)">3.2x</div><div class="lbl">ROAS</div></div>
+            <div class="proj-kpi"><div class="num" style="color:var(--volt)">6.3</div><div class="lbl">TOUCHPOINTS</div></div>
           </div>
-          <div class="proj-metrics-strip">
-            <div class="proj-metric-item"><span class="val" style="color:var(--hot)">$2.4M</span><span class="lbl">REVENUE ATTRIBUTED</span></div>
-            <div class="proj-metric-item"><span class="val" style="color:var(--neon)">3.2x</span><span class="lbl">BLENDED ROAS</span></div>
-            <div class="proj-metric-item"><span class="val" style="color:var(--volt)">6.3</span><span class="lbl">AVG TOUCHPOINTS</span></div>
-          </div>
-          <div class="proj-tags-row">
-            <span class="proj-tag" style="background:rgba(247,37,133,.08);color:var(--hot)">Attribution</span>
-            <span class="proj-tag" style="background:rgba(0,245,212,.08);color:var(--neon)">SQL</span>
-            <span class="proj-tag" style="background:rgba(173,255,47,.08);color:var(--volt)">Power BI</span>
-            <span class="proj-tag" style="background:rgba(199,125,255,.08);color:var(--purple)">CRM</span>
+          <div class="proj-tech">
+            <span class="proj-tech-tag" style="background:rgba(247,37,133,.06);color:var(--hot)">Attribution</span>
+            <span class="proj-tech-tag" style="background:rgba(0,245,212,.06);color:var(--neon)">SQL</span>
+            <span class="proj-tech-tag" style="background:rgba(173,255,47,.06);color:var(--volt)">Power BI</span>
           </div>
         </div>
-        <div class="proj-cta-footer">
-          <button class="proj-open-btn hot" onclick="event.stopPropagation();openProject(1)">Explore Dashboard <span class="proj-arrow">&rarr;</span></button>
-          <span class="proj-complexity">5 charts &middot; buyer journeys &middot; insights</span>
+        <div class="proj-footer">
+          <button class="proj-cta hot" onclick="event.stopPropagation();openProject(1)">Explore <span class="arrow">&rarr;</span></button>
+          <span class="proj-complexity">5 charts &middot; buyer journeys</span>
         </div>
       </div>
 
-      <!-- PROJECT 3 -->
-      <div class="proj-card fade-in" data-accent="volt" onclick="openProject(2)">
-        <div class="proj-card-inner">
+      <!-- P3 -->
+      <div class="proj-card reveal" data-accent="volt" onclick="openProject(2)">
+        <div class="proj-inner">
           <div class="proj-num" style="color:var(--volt)">PROJECT 03 &middot; ETL &middot; AUTOMATION</div>
-          <div class="proj-icon-row">
-            <div class="proj-icon-box" style="background:rgba(173,255,47,.08)">&#9889;</div>
-            <span class="proj-status" style="background:rgba(173,255,47,.08);color:var(--volt);border:1px solid rgba(173,255,47,.2)">RUNNING 24/7</span>
+          <div class="proj-head">
+            <div class="proj-icon" style="background:rgba(173,255,47,.06)">&#9889;</div>
+            <span class="proj-badge" style="background:rgba(173,255,47,.06);color:var(--volt);border:1px solid rgba(173,255,47,.15)">24/7</span>
           </div>
-          <div class="proj-title">Campaign Performance Automation Engine</div>
-          <div class="proj-desc">End-to-end ETL pipeline replacing 40hrs/month of manual reporting. Processes 50K+ rows daily. Reduced decision latency from 5 days to under 24 hours.</div>
-          <div class="proj-mini-chart"><canvas id="c3"></canvas></div>
-          <div class="proj-insight-preview" style="background:rgba(173,255,47,.03);border-color:rgba(173,255,47,.1)">
-            <div class="proj-insight-label" style="color:var(--volt)">TOP FINDING</div>
-            <strong>Webinar campaigns were generating 478% ROI</strong> but receiving only 8% of budget — invisible in manual reporting.
+          <div class="proj-name">Campaign Performance Engine</div>
+          <div class="proj-summary">End-to-end ETL pipeline replacing 40hrs/month of manual reporting. Processes 50K+ rows daily. Decision latency from 5 days to &lt;24hrs.</div>
+          <div class="proj-chart-wrap"><canvas id="c3"></canvas></div>
+          <div class="proj-insight" style="background:rgba(173,255,47,.02);border-color:rgba(173,255,47,.06)"><span class="proj-insight-tag" style="color:var(--volt)">TOP FINDING</span><strong>Webinar campaigns were generating 478% ROI</strong> but receiving only 8% of budget.</div>
+          <div class="proj-kpis">
+            <div class="proj-kpi"><div class="num" style="color:var(--volt)">342%</div><div class="lbl">ROI</div></div>
+            <div class="proj-kpi"><div class="num" style="color:var(--neon)">50K+</div><div class="lbl">ROWS/DAY</div></div>
+            <div class="proj-kpi"><div class="num" style="color:var(--hot)">99.8%</div><div class="lbl">UPTIME</div></div>
           </div>
-          <div class="proj-metrics-strip">
-            <div class="proj-metric-item"><span class="val" style="color:var(--volt)">342%</span><span class="lbl">BLENDED ROI</span></div>
-            <div class="proj-metric-item"><span class="val" style="color:var(--neon)">50K+</span><span class="lbl">ROWS/DAY</span></div>
-            <div class="proj-metric-item"><span class="val" style="color:var(--hot)">99.8%</span><span class="lbl">UPTIME</span></div>
-          </div>
-          <div class="proj-tags-row">
-            <span class="proj-tag" style="background:rgba(173,255,47,.08);color:var(--volt)">ETL Pipeline</span>
-            <span class="proj-tag" style="background:rgba(0,245,212,.08);color:var(--neon)">Dimensional</span>
-            <span class="proj-tag" style="background:rgba(247,37,133,.08);color:var(--hot)">Power BI</span>
-            <span class="proj-tag" style="background:rgba(67,97,238,.08);color:var(--blue)">Automation</span>
+          <div class="proj-tech">
+            <span class="proj-tech-tag" style="background:rgba(173,255,47,.06);color:var(--volt)">ETL</span>
+            <span class="proj-tech-tag" style="background:rgba(0,245,212,.06);color:var(--neon)">Dimensional</span>
+            <span class="proj-tech-tag" style="background:rgba(247,37,133,.06);color:var(--hot)">Power BI</span>
           </div>
         </div>
-        <div class="proj-cta-footer">
-          <button class="proj-open-btn volt" onclick="event.stopPropagation();openProject(2)">Explore Dashboard <span class="proj-arrow">&rarr;</span></button>
-          <span class="proj-complexity">ETL viz &middot; 6 charts &middot; live log</span>
+        <div class="proj-footer">
+          <button class="proj-cta volt" onclick="event.stopPropagation();openProject(2)">Explore <span class="arrow">&rarr;</span></button>
+          <span class="proj-complexity">ETL viz &middot; live log</span>
         </div>
       </div>
 
-      <!-- PROJECT 4 -->
-      <div class="proj-card fade-in" data-accent="purple" onclick="openProject(3)">
-        <div class="proj-card-inner">
+      <!-- P4 -->
+      <div class="proj-card reveal" data-accent="purple" onclick="openProject(3)">
+        <div class="proj-inner">
           <div class="proj-num" style="color:var(--purple)">PROJECT 04 &middot; PREDICTIVE ANALYTICS</div>
-          <div class="proj-icon-row">
-            <div class="proj-icon-box" style="background:rgba(199,125,255,.08)">&#128300;</div>
-            <span class="proj-status" style="background:rgba(199,125,255,.08);color:var(--purple);border:1px solid rgba(199,125,255,.2)">78.4% ACCURACY</span>
+          <div class="proj-head">
+            <div class="proj-icon" style="background:rgba(199,125,255,.06)">&#128300;</div>
+            <span class="proj-badge" style="background:rgba(199,125,255,.06);color:var(--purple);border:1px solid rgba(199,125,255,.15)">78.4%</span>
           </div>
-          <div class="proj-title">Lead Quality Scoring &amp; Cohort Analysis</div>
-          <div class="proj-desc">15-signal weighted scoring model that identifies high-probability leads. Cohort analysis tracks 6-month retention. Score 80+ leads convert at 34.2% — 4.7x the base rate.</div>
-          <div class="proj-mini-chart"><canvas id="c4"></canvas></div>
-          <div class="proj-insight-preview" style="background:rgba(199,125,255,.03);border-color:rgba(199,125,255,.1)">
-            <div class="proj-insight-label" style="color:var(--purple)">TOP FINDING</div>
-            <strong>Enterprise customers retained 68% at Month 6 vs SMB's 24%</strong> — a 2.8x retention gap informing GTM strategy.
+          <div class="proj-name">Lead Scoring &amp; Cohort Analysis</div>
+          <div class="proj-summary">15-signal weighted scoring model that identifies high-probability leads. Score 80+ leads convert at 34.2% — 4.7x the base rate.</div>
+          <div class="proj-chart-wrap"><canvas id="c4"></canvas></div>
+          <div class="proj-insight" style="background:rgba(199,125,255,.02);border-color:rgba(199,125,255,.06)"><span class="proj-insight-tag" style="color:var(--purple)">TOP FINDING</span><strong>Enterprise retained 68% at Month 6 vs SMB's 24%</strong> — a 2.8x retention gap.</div>
+          <div class="proj-kpis">
+            <div class="proj-kpi"><div class="num" style="color:var(--purple)">+18%</div><div class="lbl">PIPELINE</div></div>
+            <div class="proj-kpi"><div class="num" style="color:var(--neon)">34.2%</div><div class="lbl">TOP CONV</div></div>
+            <div class="proj-kpi"><div class="num" style="color:var(--hot)">3,842</div><div class="lbl">SCORED</div></div>
           </div>
-          <div class="proj-metrics-strip">
-            <div class="proj-metric-item"><span class="val" style="color:var(--purple)">+18%</span><span class="lbl">PIPELINE RECOVERED</span></div>
-            <div class="proj-metric-item"><span class="val" style="color:var(--neon)">34.2%</span><span class="lbl">TOP-TIER CONV</span></div>
-            <div class="proj-metric-item"><span class="val" style="color:var(--hot)">3,842</span><span class="lbl">LEADS SCORED</span></div>
-          </div>
-          <div class="proj-tags-row">
-            <span class="proj-tag" style="background:rgba(199,125,255,.08);color:var(--purple)">Scoring</span>
-            <span class="proj-tag" style="background:rgba(0,245,212,.08);color:var(--neon)">Cohort</span>
-            <span class="proj-tag" style="background:rgba(247,37,133,.08);color:var(--hot)">Marketo</span>
-            <span class="proj-tag" style="background:rgba(173,255,47,.08);color:var(--volt)">GA4 &middot; SQL</span>
+          <div class="proj-tech">
+            <span class="proj-tech-tag" style="background:rgba(199,125,255,.06);color:var(--purple)">Scoring</span>
+            <span class="proj-tech-tag" style="background:rgba(0,245,212,.06);color:var(--neon)">Cohort</span>
+            <span class="proj-tech-tag" style="background:rgba(247,37,133,.06);color:var(--hot)">Marketo</span>
           </div>
         </div>
-        <div class="proj-cta-footer">
-          <button class="proj-open-btn purple" onclick="event.stopPropagation();openProject(3)">Explore Dashboard <span class="proj-arrow">&rarr;</span></button>
-          <span class="proj-complexity">scoring model &middot; cohort heatmap</span>
+        <div class="proj-footer">
+          <button class="proj-cta purple" onclick="event.stopPropagation();openProject(3)">Explore <span class="arrow">&rarr;</span></button>
+          <span class="proj-complexity">scoring &middot; cohort heatmap</span>
         </div>
       </div>
 
@@ -591,53 +549,36 @@ footer p{color:var(--muted);font-size:.74rem;font-family:'Space Mono',monospace}
   </div>
 </section>
 
-<!-- ═══════════════════ PROJECT VIEWER (MODAL) ═══════════════════ -->
+<!-- PROJECT VIEWER -->
 <div class="project-viewer" id="projectViewer">
-  <div class="viewer-header">
-    <div>
-      <div class="viewer-project-title" id="viewerTitle">Dashboard</div>
-      <div class="viewer-project-subtitle" id="viewerSubtitle">PROJECT 01</div>
-    </div>
-    <div class="viewer-nav" id="viewerNav">
-      <button class="viewer-nav-btn active" onclick="switchProject(0)">01 RevOps</button>
-      <button class="viewer-nav-btn" onclick="switchProject(1)">02 Attribution</button>
-      <button class="viewer-nav-btn" onclick="switchProject(2)">03 Campaign</button>
-      <button class="viewer-nav-btn" onclick="switchProject(3)">04 Lead Score</button>
+  <div class="viewer-bar">
+    <div class="viewer-info"><div class="viewer-title" id="viewerTitle">Dashboard</div><div class="viewer-sub" id="viewerSub">PROJECT 01</div></div>
+    <div class="viewer-tabs" id="viewerTabs">
+      <button class="viewer-tab active" onclick="switchProject(0)">01 RevOps</button>
+      <button class="viewer-tab" onclick="switchProject(1)">02 Attribution</button>
+      <button class="viewer-tab" onclick="switchProject(2)">03 Campaign</button>
+      <button class="viewer-tab" onclick="switchProject(3)">04 Scoring</button>
     </div>
     <button class="viewer-close" onclick="closeViewer()" title="Close">&times;</button>
   </div>
-  <div class="viewer-body">
-    <iframe id="viewerFrame" title="Project Dashboard"></iframe>
-  </div>
+  <div class="viewer-frame-wrap"><iframe id="viewerFrame" title="Project Dashboard"></iframe></div>
 </div>
 
 <!-- CONTACT -->
 <section id="contact">
   <div class="section-inner">
-    <div class="contact-grid">
-      <div class="contact-text fade-in">
-        <div class="section-label">Let's Connect</div>
+    <div class="contact-layout">
+      <div class="contact-cta reveal">
+        <div class="section-eyebrow">Let's Connect</div>
         <h2>Ready to drive <span style="color:var(--neon)">revenue</span> with data?</h2>
-        <p>Actively seeking Revenue Operations, Marketing Analytics, and BI roles at high-growth companies. I bring 2.5+ years of hands-on experience building the exact infrastructure that data-driven companies need.</p>
-        <a href="mailto:tanmoyacharjee661@gmail.com" class="btn-primary">Send Email <span>&rarr;</span></a>
+        <p>Actively seeking Revenue Operations, Marketing Analytics, and BI roles at high-growth companies. 2.5+ years of hands-on experience building the exact infrastructure data-driven companies need.</p>
+        <a href="mailto:tanmoyacharjee661@gmail.com" class="btn-primary">Send Email &rarr;</a>
       </div>
-      <div class="contact-links fade-in fade-in-delay-1">
-        <a href="mailto:tanmoyacharjee661@gmail.com" class="contact-link">
-          <div class="icon-wrap">&#9993;</div>
-          <span class="info"><span class="label">EMAIL</span><span class="val">tanmoyacharjee661@gmail.com</span></span>
-        </a>
-        <a href="tel:+916291046523" class="contact-link">
-          <div class="icon-wrap">&#128241;</div>
-          <span class="info"><span class="label">PHONE</span><span class="val">+91-62910-46523</span></span>
-        </a>
-        <a href="https://linkedin.com/in/tanmoy-ab54154213" target="_blank" class="contact-link">
-          <div class="icon-wrap">&#128188;</div>
-          <span class="info"><span class="label">LINKEDIN</span><span class="val">linkedin.com/in/tanmoy-ab54154213</span></span>
-        </a>
-        <div class="contact-link">
-          <div class="icon-wrap">&#128205;</div>
-          <span class="info"><span class="label">LOCATION</span><span class="val">Barrackpore, West Bengal, India</span></span>
-        </div>
+      <div class="contact-cards reveal reveal-d1">
+        <a href="mailto:tanmoyacharjee661@gmail.com" class="contact-card"><div class="contact-card-icon">&#9993;</div><span class="contact-card-info"><span class="contact-card-label">EMAIL</span><span class="contact-card-val">tanmoyacharjee661@gmail.com</span></span></a>
+        <a href="tel:+916291046523" class="contact-card"><div class="contact-card-icon">&#128241;</div><span class="contact-card-info"><span class="contact-card-label">PHONE</span><span class="contact-card-val">+91-62910-46523</span></span></a>
+        <a href="https://linkedin.com/in/tanmoy-ab54154213" target="_blank" class="contact-card"><div class="contact-card-icon">&#128188;</div><span class="contact-card-info"><span class="contact-card-label">LINKEDIN</span><span class="contact-card-val">linkedin.com/in/tanmoy-ab54154213</span></span></a>
+        <div class="contact-card"><div class="contact-card-icon">&#128205;</div><span class="contact-card-info"><span class="contact-card-label">LOCATION</span><span class="contact-card-val">Barrackpore, West Bengal, India</span></span></div>
       </div>
     </div>
   </div>
@@ -648,141 +589,187 @@ footer p{color:var(--muted);font-size:.74rem;font-family:'Space Mono',monospace}
   <p>Built with data-driven precision</p>
 </footer>
 
-<!-- BACK TO TOP -->
-<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#8593;</button>
+<button class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Top">&#8593;</button>
 
 <script>
-// ═══════════════════ PRELOADER ═══════════════════
-window.addEventListener('load',()=>{
-  setTimeout(()=>document.getElementById('preloader').classList.add('done'),600);
-});
+/* ═══════════════════ PRELOADER ═══════════════════ */
+window.addEventListener('load',()=>setTimeout(()=>document.getElementById('preloader').classList.add('done'),700));
 
-// ═══════════════════ NAV SCROLL ═══════════════════
-const nav=document.querySelector('nav');
-const sections=document.querySelectorAll('section[id]');
-const navLinksAll=document.querySelectorAll('.nav-links a');
+/* ═══════════════════ CANVAS TRAIL EFFECT (21st.dev port) ═══════════════════ */
+(function(){
+  var ctx,f,e=0,pos={x:0,y:0},lines=[],
+      E={friction:.5,trails:80,size:50,dampening:.025,tension:.99};
+  function Osc(o){this.phase=o.phase||0;this.offset=o.offset||0;this.frequency=o.frequency||.001;this.amplitude=o.amplitude||1}
+  Osc.prototype.update=function(){this.phase+=this.frequency;e=this.offset+Math.sin(this.phase)*this.amplitude;return e};
+  function Node(){this.x=0;this.y=0;this.vx=0;this.vy=0}
+  function Line(o){this.spring=o.spring+.1*Math.random()-.05;this.friction=E.friction+.01*Math.random()-.005;this.nodes=[];for(var i=0;i<E.size;i++){var n=new Node();n.x=pos.x;n.y=pos.y;this.nodes.push(n)}}
+  Line.prototype.update=function(){var s=this.spring,t=this.nodes[0];t.vx+=(pos.x-t.x)*s;t.vy+=(pos.y-t.y)*s;for(var i=0,len=this.nodes.length;i<len;i++){t=this.nodes[i];if(i>0){var n=this.nodes[i-1];t.vx+=(n.x-t.x)*s;t.vy+=(n.y-t.y)*s;t.vx+=n.vx*E.dampening;t.vy+=n.vy*E.dampening}t.vx*=this.friction;t.vy*=this.friction;t.x+=t.vx;t.y+=t.vy;s*=E.tension}};
+  Line.prototype.draw=function(){var n=this.nodes[0].x,o=this.nodes[0].y;ctx.beginPath();ctx.moveTo(n,o);for(var i=1,len=this.nodes.length-2;i<len;i++){var a=this.nodes[i],b=this.nodes[i+1];n=.5*(a.x+b.x);o=.5*(a.y+b.y);ctx.quadraticCurveTo(a.x,a.y,n,o)}a=this.nodes[i];b=this.nodes[i+1];ctx.quadraticCurveTo(a.x,a.y,b.x,b.y);ctx.stroke();ctx.closePath()};
+  function initLines(){lines=[];for(var i=0;i<E.trails;i++)lines.push(new Line({spring:.45+(i/E.trails)*.025}))}
+  function onMove(ev){document.removeEventListener('mousemove',onMove);document.removeEventListener('touchstart',onMove);function c(ev){ev.touches?(pos.x=ev.touches[0].pageX,pos.y=ev.touches[0].pageY):(pos.x=ev.clientX,pos.y=ev.clientY)}document.addEventListener('mousemove',c);document.addEventListener('touchmove',c);document.addEventListener('touchstart',function(ev){if(ev.touches.length===1){pos.x=ev.touches[0].pageX;pos.y=ev.touches[0].pageY}});c(ev);initLines();render()}
+  function render(){if(!ctx||!ctx.running)return;ctx.globalCompositeOperation='source-over';ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);ctx.globalCompositeOperation='lighter';ctx.strokeStyle='hsla('+Math.round(f.update())+',100%,50%,0.025)';ctx.lineWidth=10;for(var i=0;i<E.trails;i++){lines[i].update();lines[i].draw()}ctx.frame++;window.requestAnimationFrame(render)}
+  function resize(){ctx.canvas.width=window.innerWidth;ctx.canvas.height=window.innerHeight}
+  window.addEventListener('load',function(){var c=document.getElementById('canvas');if(!c)return;ctx=c.getContext('2d');ctx.running=true;ctx.frame=1;f=new Osc({phase:Math.random()*2*Math.PI,amplitude:85,frequency:.0015,offset:285});document.addEventListener('mousemove',onMove);document.addEventListener('touchstart',onMove);window.addEventListener('resize',resize);resize()});
+})();
+
+/* ═══════════════════ NAV ═══════════════════ */
+const navEl=document.querySelector('nav'),secEls=document.querySelectorAll('section[id]'),navAs=document.querySelectorAll('.nav-links a');
 window.addEventListener('scroll',()=>{
-  nav.classList.toggle('scrolled',window.scrollY>50);
-  // back to top
-  document.getElementById('backToTop').classList.toggle('show',window.scrollY>600);
-  // active nav
-  let current='';
-  sections.forEach(s=>{
-    if(window.scrollY>=s.offsetTop-200) current=s.getAttribute('id');
-  });
-  navLinksAll.forEach(a=>{
-    a.classList.toggle('active',a.getAttribute('href')==='#'+current);
-  });
+  navEl.classList.toggle('scrolled',scrollY>40);
+  document.getElementById('btt').classList.toggle('show',scrollY>500);
+  let cur='';secEls.forEach(s=>{if(scrollY>=s.offsetTop-200)cur=s.id});
+  navAs.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur));
 });
+document.getElementById('mobileToggle').addEventListener('click',()=>document.getElementById('navLinks').classList.toggle('open'));
+navAs.forEach(a=>a.addEventListener('click',()=>document.getElementById('navLinks').classList.remove('open')));
 
-// ═══════════════════ MOBILE MENU ═══════════════════
-document.getElementById('mobileToggle').addEventListener('click',()=>{
-  document.getElementById('navLinks').classList.toggle('open');
-});
-document.querySelectorAll('.nav-links a').forEach(a=>{
-  a.addEventListener('click',()=>document.getElementById('navLinks').classList.remove('open'));
-});
-
-// ═══════════════════ TYPING ═══════════════════
+/* ═══════════════════ TYPING ═══════════════════ */
 const roles=['RevOps Specialist','BI Architect','Marketing Analyst','Data Strategist','Campaign Engineer'];
-let ri=0,ci=0,del=false;
-const typedEl=document.getElementById('typed-role');
-function type(){
-  const w=roles[ri];
-  if(!del){typedEl.textContent=w.slice(0,ci+1);ci++;if(ci===w.length){del=true;setTimeout(type,2000);return}}
-  else{typedEl.textContent=w.slice(0,ci-1);ci--;if(ci===0){del=false;ri=(ri+1)%roles.length}}
-  setTimeout(type,del?50:90);
-}
-type();
+let ri=0,ci=0,del=false;const typed=document.getElementById('typedRole');
+function typeLoop(){const w=roles[ri];if(!del){typed.textContent=w.slice(0,ci+1);ci++;if(ci===w.length){del=true;setTimeout(typeLoop,2200);return}}else{typed.textContent=w.slice(0,ci-1);ci--;if(ci===0){del=false;ri=(ri+1)%roles.length}}setTimeout(typeLoop,del?45:85)}
+typeLoop();
 
-// ═══════════════════ COUNTUP ═══════════════════
-function countUp(el){
-  const target=parseInt(el.dataset.target);
-  let current=0;const step=Math.ceil(target/40);
-  const suffix=el.querySelector('span')?el.querySelector('span').outerHTML:'';
-  const t=setInterval(()=>{current=Math.min(current+step,target);el.innerHTML=current+(suffix||'');if(current>=target)clearInterval(t)},35);
-}
+/* ═══════════════════ COUNTUP ═══════════════════ */
+function countUp(el){const t=+el.dataset.target;let c=0;const s=Math.ceil(t/45),sfx=el.querySelector('span')?el.querySelector('span').outerHTML:'';const iv=setInterval(()=>{c=Math.min(c+s,t);el.innerHTML=c+(sfx||'');if(c>=t)clearInterval(iv)},30)}
 
-// ═══════════════════ OBSERVER ═══════════════════
-const obs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      e.target.classList.add('visible');
-      e.target.querySelectorAll('[data-target]').forEach(n=>countUp(n));
+/* ═══════════════════ INTERSECTION OBSERVER ═══════════════════ */
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');e.target.querySelectorAll('[data-target]').forEach(n=>countUp(n))}})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+/* ═══════════════════ CHARTS ═══════════════════ */
+const cBase={responsive:true,maintainAspectRatio:false,animation:{duration:1200,easing:'easeOutQuart'},plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}};
+new Chart(document.getElementById('c1'),{type:'bar',data:{labels:['Jan','Mar','May','Jul','Sep','Nov'],datasets:[{data:[280,340,380,420,490,510],backgroundColor:'rgba(0,245,212,.15)',borderColor:'#00F5D4',borderWidth:1.5,borderRadius:4},{data:[85,105,118,135,162,180],backgroundColor:'rgba(247,37,133,.15)',borderColor:'#F72585',borderWidth:1.5,borderRadius:4}]},options:cBase});
+new Chart(document.getElementById('c2'),{type:'doughnut',data:{labels:['LinkedIn','Google','Organic','Email','Webinar','Other'],datasets:[{data:[28,19,16,22,11,4],backgroundColor:['rgba(247,37,133,.7)','rgba(0,245,212,.7)','rgba(173,255,47,.7)','rgba(255,107,53,.7)','rgba(199,125,255,.7)','rgba(100,116,139,.4)'],borderWidth:0}]},options:{...cBase,cutout:'70%'}});
+new Chart(document.getElementById('c3'),{type:'line',data:{labels:['Jan','Mar','May','Jul','Sep','Nov'],datasets:[{data:[165,195,235,255,310,342],borderColor:'#ADFF2F',backgroundColor:'rgba(173,255,47,.04)',tension:.4,fill:true,pointRadius:2.5,pointBackgroundColor:'#ADFF2F'}]},options:cBase});
+new Chart(document.getElementById('c4'),{type:'bar',data:{labels:['0-20','21-40','41-60','61-80','81-100'],datasets:[{data:[1.2,5.2,12.4,22.7,34.2],backgroundColor:['rgba(247,37,133,.35)','rgba(247,37,133,.45)','rgba(0,245,212,.35)','rgba(0,245,212,.55)','rgba(173,255,47,.65)'],borderRadius:4}]},options:cBase});
+
+/* ═══════════════════ RADIAL ORBITAL TIMELINE (21st.dev port) ═══════════════════ */
+(function(){
+  const data=[
+    {id:1,title:'Asst. Manager',icon:'&#128640;',date:'Jan 2025 — Present',status:'in-progress',energy:95,category:'RevOps · BI · Automation',content:'Architected end-to-end RevOps infrastructure spanning CRM, Marketo, ETL pipelines & Power BI for 12+ stakeholders.',relatedIds:[2,3],detail:{company:'NetCom Learning — New York (Remote)',tag:'neon',tagText:'REVOPS · BI ARCHITECTURE · AUTOMATION',bullets:['Architected end-to-end RevOps infrastructure spanning CRM, Marketo, ETL pipelines & Power BI executive dashboards for 12+ stakeholders','Engineered prospect scoring & lifecycle routing across MQL → SQL → Opportunity → Closed Won across 3 buyer segments','Eliminated manual reporting burden through Power BI automation consolidating 6 data sources <span class="detail-metric">−40 hrs/month</span>','Reduced campaign decision lag through dimensional ETL modelling <span class="detail-metric">5 days → <24 hrs</span>','Drove process optimisation via pipeline automation <span class="detail-metric">+30% efficiency</span>']}},
+    {id:2,title:'Team Lead',icon:'&#128200;',date:'Jul 2024 — Jan 2025',status:'completed',energy:82,category:'Campaign Analytics · Power BI',content:'Led campaign performance analysis across ROI, ROAS, CTR, CPL & conversion metrics across all channels.',relatedIds:[1,3],detail:{company:'NetCom Learning — New York (Remote)',tag:'hot',tagText:'CAMPAIGN ANALYTICS · POWER BI · OKRs',bullets:['Led campaign performance analysis across ROI, ROAS, CTR, CPL & conversion metrics across all channels','Identified 3 major funnel drop-off points; targeted interventions recovered qualified pipeline <span class="detail-metric">+18% pipeline</span>','Built Power BI dashboards tracking 15+ KPIs; established OKR reporting frameworks across 4 departments']}},
+    {id:3,title:'Mktg Analyst',icon:'&#128270;',date:'Aug 2023 — Jul 2024',status:'completed',energy:68,category:'Funnel Analytics · Reporting',content:'Audited full revenue operations funnel daily across 10+ paid & organic channels.',relatedIds:[2],detail:{company:'NetCom Learning — New York (Remote)',tag:'volt',tagText:'FUNNEL ANALYTICS · PERFORMANCE REPORTING',bullets:['Audited full revenue operations funnel daily across 10+ paid & organic channels','Established funnel hygiene frameworks that became the team-wide reporting baseline across 4 departments']}},
+    {id:4,title:'Attribution',icon:'&#127919;',date:'2024',status:'completed',energy:90,category:'Multi-Touch · Modelling',content:'Built 3 attribution models on $2.4M of closed revenue across 8 channels.',relatedIds:[1,5],detail:{company:'Project — Attribution Modelling',tag:'hot',tagText:'MULTI-TOUCH · SQL · POWER BI',bullets:['Built 3 complete attribution models (first-touch, last-touch, linear) on $2.4M revenue','Revealed LinkedIn under-credited by 18pp — reversed a planned $42K budget cut','Average buyer journey spans 6.3 touchpoints across 38 days']}},
+    {id:5,title:'ETL Engine',icon:'&#9889;',date:'2024',status:'completed',energy:88,category:'Automation · Pipeline',content:'End-to-end ETL pipeline replacing 40hrs/month of manual reporting. 50K+ rows daily.',relatedIds:[1,4],detail:{company:'Project — Campaign Automation',tag:'volt',tagText:'ETL PIPELINE · DIMENSIONAL · AUTOMATION',bullets:['Built end-to-end ETL replacing 40 hrs/month of manual reporting','Processes 50K+ rows daily with 99.8% uptime','Webinar campaigns generating 478% ROI were invisible in manual reporting']}},
+    {id:6,title:'Lead Score',icon:'&#128300;',date:'2025',status:'in-progress',energy:78,category:'Predictive · Cohort',content:'15-signal scoring model. Score 80+ leads convert at 34.2% — 4.7x the base rate.',relatedIds:[1,2],detail:{company:'Project — Predictive Analytics',tag:'neon',tagText:'SCORING MODEL · COHORT · MARKETO',bullets:['15-signal weighted scoring model identifies high-probability leads','Score 80+ leads convert at 34.2% — 4.7x the base rate','Enterprise retained 68% at Month 6 vs SMB 24% — 2.8x gap']}}
+  ];
+
+  const container=document.getElementById('orbitalContainer');
+  const detailContent=document.getElementById('detailContent');
+  const placeholder=document.getElementById('detailPlaceholder');
+  let activeId=null,autoRotate=true,angle=0,nodes={};
+
+  // Create nodes
+  data.forEach((item,i)=>{
+    const node=document.createElement('div');
+    node.className='orbital-node';
+    node.dataset.id=item.id;
+    node.innerHTML=`
+      <div class="node-glow" style="width:${item.energy*.5+40}px;height:${item.energy*.5+40}px;left:-${(item.energy*.5+40-42)/2}px;top:-${(item.energy*.5+40-42)/2}px"></div>
+      <div class="node-pulse"></div>
+      <div class="node-icon">${item.icon}</div>
+      <div class="node-label">${item.title}</div>
+      <div class="orbital-card">
+        <div class="ocard-header"><span class="ocard-badge ${item.status}">${item.status==='completed'?'COMPLETE':item.status==='in-progress'?'IN PROGRESS':'PENDING'}</span><span class="ocard-date">${item.date}</span></div>
+        <div class="ocard-title">${item.title}</div>
+        <div class="ocard-body">${item.content}</div>
+        <div class="ocard-energy"><div class="ocard-energy-header"><span>&#9889; Energy</span><span>${item.energy}%</span></div><div class="energy-bar"><div class="energy-fill" style="width:${item.energy}%"></div></div></div>
+        ${item.relatedIds.length?`<div class="ocard-connections"><div class="ocard-conn-label">Connected Nodes</div><div class="ocard-conn-list">${item.relatedIds.map(rid=>{const r=data.find(d=>d.id===rid);return `<button class="ocard-conn-btn" data-goto="${rid}">${r?r.title:'?'} &rarr;</button>`}).join('')}</div></div>`:''}
+      </div>
+    `;
+    node.addEventListener('click',(ev)=>{ev.stopPropagation();toggleNode(item.id)});
+    // Connection button clicks
+    node.querySelectorAll('.ocard-conn-btn').forEach(btn=>{
+      btn.addEventListener('click',(ev)=>{ev.stopPropagation();toggleNode(+btn.dataset.goto)});
+    });
+    container.appendChild(node);
+    nodes[item.id]=node;
+  });
+
+  // Position
+  function positionNodes(){
+    data.forEach((item,i)=>{
+      const a=((i/data.length)*360+angle)%360;
+      const r=Math.min(container.offsetWidth,container.offsetHeight)*.42;
+      const rad=a*Math.PI/180;
+      const x=r*Math.cos(rad);
+      const y=r*Math.sin(rad);
+      const opacity=Math.max(.35,Math.min(1,.35+.65*((1+Math.sin(rad))/2)));
+      const z=Math.round(100+50*Math.cos(rad));
+      const node=nodes[item.id];
+      node.style.left=`calc(50% + ${x}px - 21px)`;
+      node.style.top=`calc(50% + ${y}px - 21px)`;
+      if(!node.classList.contains('active')){node.style.opacity=opacity;node.style.zIndex=z}
+    });
+  }
+
+  function toggleNode(id){
+    if(activeId===id){
+      nodes[id].classList.remove('active');
+      data.find(d=>d.id===id).relatedIds.forEach(rid=>nodes[rid]&&nodes[rid].classList.remove('related'));
+      activeId=null;autoRotate=true;
+      detailContent.style.display='none';placeholder.style.display='';
+    }else{
+      if(activeId){nodes[activeId].classList.remove('active');data.find(d=>d.id===activeId).relatedIds.forEach(rid=>nodes[rid]&&nodes[rid].classList.remove('related'))}
+      nodes[id].classList.add('active');
+      const item=data.find(d=>d.id===id);
+      item.relatedIds.forEach(rid=>nodes[rid]&&nodes[rid].classList.add('related'));
+      activeId=id;autoRotate=false;
+      // Center node
+      const idx=data.findIndex(d=>d.id===id);
+      angle=270-(idx/data.length)*360;
+      // Show detail
+      const d=item.detail;
+      detailContent.innerHTML=`
+        <div class="detail-role-tag ${d.tag}">${d.tagText}</div>
+        <div class="detail-company">${d.company}</div>
+        <div class="detail-period">${item.date}</div>
+        <ul class="detail-bullets">${d.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>
+      `;
+      detailContent.style.display='block';placeholder.style.display='none';
+    }
+  }
+
+  // Click container to deselect
+  container.addEventListener('click',(ev)=>{
+    if(ev.target===container||ev.target.classList.contains('orbit-ring')){
+      if(activeId){toggleNode(activeId)}
     }
   });
-},{threshold:.12});
-document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
 
-// ═══════════════════ MINI CHARTS ═══════════════════
-const CC={neon:'#00F5D4',hot:'#F72585',volt:'#ADFF2F',purple:'#C77DFF',blue:'#4361EE'};
-const base={responsive:true,maintainAspectRatio:false,animation:{duration:1400,easing:'easeOutQuart'},
-  plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}};
+  // Auto-rotate
+  let raf;
+  function tick(){
+    if(autoRotate)angle=(angle+.25)%360;
+    positionNodes();
+    raf=requestAnimationFrame(tick);
+  }
+  tick();
+})();
 
-new Chart(document.getElementById('c1'),{type:'bar',
-  data:{labels:['Jan','Mar','May','Jul','Sep','Nov'],datasets:[
-    {data:[280,340,380,420,490,510],backgroundColor:'rgba(0,245,212,.2)',borderColor:CC.neon,borderWidth:1.5,borderRadius:4},
-    {data:[85,105,118,135,162,180],backgroundColor:'rgba(247,37,133,.2)',borderColor:CC.hot,borderWidth:1.5,borderRadius:4}
-  ]},options:base});
-
-new Chart(document.getElementById('c2'),{type:'doughnut',
-  data:{labels:['LinkedIn','Google PPC','Organic','Email','Webinar','Other'],datasets:[{
-    data:[28,19,16,22,11,4],
-    backgroundColor:['rgba(247,37,133,.75)','rgba(0,245,212,.75)','rgba(173,255,47,.75)','rgba(255,107,53,.75)','rgba(199,125,255,.75)','rgba(100,116,139,.5)'],
-    borderWidth:0}]},
-  options:{...base,cutout:'68%'}});
-
-new Chart(document.getElementById('c3'),{type:'line',
-  data:{labels:['Jan','Mar','May','Jul','Sep','Nov'],datasets:[{
-    data:[165,195,235,255,310,342],
-    borderColor:CC.volt,backgroundColor:'rgba(173,255,47,.06)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:CC.volt
-  }]},options:base});
-
-new Chart(document.getElementById('c4'),{type:'bar',
-  data:{labels:['0-20','21-40','41-60','61-80','81-100'],datasets:[{
-    data:[1.2,5.2,12.4,22.7,34.2],
-    backgroundColor:['rgba(247,37,133,.4)','rgba(247,37,133,.5)','rgba(0,245,212,.4)','rgba(0,245,212,.6)','rgba(173,255,47,.7)'],
-    borderRadius:5}]},options:base});
-
-// ═══════════════════ PROJECT VIEWER ═══════════════════
+/* ═══════════════════ PROJECT VIEWER ═══════════════════ */
 const projects=[
-  {file:'project1_revops_dashboard.html',title:'Full-Funnel Revenue Operations Dashboard',sub:'PROJECT 01 · REVENUE OPERATIONS'},
-  {file:'project2_attribution_model.html',title:'Multi-Touch Attribution Modelling Framework',sub:'PROJECT 02 · MARKETING ANALYTICS'},
-  {file:'project3_campaign_engine.html',title:'Campaign Performance Automation Engine',sub:'PROJECT 03 · ETL · AUTOMATION'},
-  {file:'project4_lead_scoring.html',title:'Lead Quality Scoring & Cohort Analysis',sub:'PROJECT 04 · PREDICTIVE ANALYTICS'},
+  {file:'project1_revops_dashboard.html',title:'Full-Funnel RevOps Dashboard',sub:'PROJECT 01 · REVENUE OPERATIONS'},
+  {file:'project2_attribution_model.html',title:'Multi-Touch Attribution Framework',sub:'PROJECT 02 · MARKETING ANALYTICS'},
+  {file:'project3_campaign_engine.html',title:'Campaign Performance Engine',sub:'PROJECT 03 · ETL · AUTOMATION'},
+  {file:'project4_lead_scoring.html',title:'Lead Scoring & Cohort Analysis',sub:'PROJECT 04 · PREDICTIVE ANALYTICS'},
 ];
-let currentProject=0;
-
-function openProject(idx){
-  currentProject=idx;
-  const viewer=document.getElementById('projectViewer');
-  document.getElementById('viewerTitle').textContent=projects[idx].title;
-  document.getElementById('viewerSubtitle').textContent=projects[idx].sub;
-  document.getElementById('viewerFrame').src=projects[idx].file;
-  // Update nav buttons
-  document.querySelectorAll('.viewer-nav-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
-  viewer.classList.add('open');
+function openProject(i){
+  document.getElementById('viewerTitle').textContent=projects[i].title;
+  document.getElementById('viewerSub').textContent=projects[i].sub;
+  document.getElementById('viewerFrame').src=projects[i].file;
+  document.querySelectorAll('.viewer-tab').forEach((t,j)=>t.classList.toggle('active',j===i));
+  document.getElementById('projectViewer').classList.add('open');
   document.body.style.overflow='hidden';
 }
-
-function switchProject(idx){
-  currentProject=idx;
-  document.getElementById('viewerTitle').textContent=projects[idx].title;
-  document.getElementById('viewerSubtitle').textContent=projects[idx].sub;
-  document.getElementById('viewerFrame').src=projects[idx].file;
-  document.querySelectorAll('.viewer-nav-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+function switchProject(i){
+  document.getElementById('viewerTitle').textContent=projects[i].title;
+  document.getElementById('viewerSub').textContent=projects[i].sub;
+  document.getElementById('viewerFrame').src=projects[i].file;
+  document.querySelectorAll('.viewer-tab').forEach((t,j)=>t.classList.toggle('active',j===i));
 }
-
-function closeViewer(){
-  document.getElementById('projectViewer').classList.remove('open');
-  document.body.style.overflow='';
-  document.getElementById('viewerFrame').src='';
-}
-
-// Close on Escape
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape') closeViewer();
-});
+function closeViewer(){document.getElementById('projectViewer').classList.remove('open');document.body.style.overflow='';document.getElementById('viewerFrame').src=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeViewer()});
 </script>
 </body>
 </html>
